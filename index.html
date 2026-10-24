@@ -57,25 +57,43 @@
 
             <!-- Controls Header Right -->
             <div class="flex items-center space-x-2 sm:space-x-3">
+                <!-- View Mode Switcher (Mobile vs Desktop Layout Toggle) -->
+                <div class="bg-gray-100 p-1 rounded-full border border-gray-200 flex items-center text-xs font-medium">
+                    <button @click="viewportMode = 'mobile'" 
+                            :class="viewportMode === 'mobile' ? 'bg-white text-blue-600 shadow-sm font-semibold' : 'text-gray-600 hover:text-gray-900'"
+                            class="px-2.5 py-1 rounded-full transition-all flex items-center space-x-1"
+                            title="Force Mobile Layout">
+                        <span class="material-symbols-outlined text-sm">smartphone</span>
+                        <span class="hidden md:inline">Mobile</span>
+                    </button>
+                    <button @click="viewportMode = 'desktop'" 
+                            :class="viewportMode === 'desktop' ? 'bg-white text-blue-600 shadow-sm font-semibold' : 'text-gray-600 hover:text-gray-900'"
+                            class="px-2.5 py-1 rounded-full transition-all flex items-center space-x-1"
+                            title="Desktop Layout">
+                        <span class="material-symbols-outlined text-sm">desktop_windows</span>
+                        <span class="hidden md:inline">Desktop</span>
+                    </button>
+                </div>
+
                 <!-- Help Guide Modal Toggle -->
                 <button @click="showGuideModal = true" class="flex items-center space-x-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 transition">
                     <span class="material-symbols-outlined text-base">help_outline</span>
                     <span class="hidden sm:inline">Guide</span>
                 </button>
 
-                <!-- Mode Switcher Pill -->
+                <!-- Access Mode Switcher Pill -->
                 <div class="bg-gray-100 p-1 rounded-full border border-gray-200 flex items-center text-xs font-medium">
                     <button @click="switchToViewer()" 
                             :class="mode === 'viewer' ? 'bg-white text-blue-600 shadow-sm font-semibold' : 'text-gray-600 hover:text-gray-900'"
                             class="px-3 py-1 rounded-full transition-all flex items-center space-x-1">
                         <span class="material-symbols-outlined text-sm">visibility</span>
-                        <span>Viewer Mode</span>
+                        <span>Viewer</span>
                     </button>
                     <button @click="requestOwnerAccess()" 
                             :class="mode === 'owner' ? 'bg-blue-600 text-white shadow-sm font-semibold' : 'text-gray-600 hover:text-gray-900'"
                             class="px-3 py-1 rounded-full transition-all flex items-center space-x-1">
                         <span class="material-symbols-outlined text-sm">enhanced_encryption</span>
-                        <span>Owner Mode</span>
+                        <span>Owner</span>
                     </button>
                 </div>
             </div>
@@ -83,7 +101,7 @@
     </header>
 
     <!-- Main Workspace -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow space-y-6 w-full">
+    <main :class="viewportMode === 'mobile' ? 'max-w-md px-2 py-4' : 'max-w-7xl px-4 sm:px-6 lg:px-8 py-8'" class="mx-auto flex-grow space-y-6 w-full transition-all duration-300">
 
         <!-- Toast Alert Notification -->
         <div x-show="toast.show" 
@@ -137,7 +155,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                <div :class="viewportMode === 'mobile' ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'" class="grid gap-4 items-end">
                     <!-- Step 1: Select Borrower Name -->
                     <div>
                         <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">1. Borrower Name *</label>
@@ -187,7 +205,7 @@
 
         <!-- OWNER MODE DASHBOARD -->
         <div x-show="mode === 'owner'" x-cloak class="space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div :class="viewportMode === 'mobile' ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-3'" class="grid gap-6">
                 <!-- Add New Book Card -->
                 <div class="google-card p-5 border-t-4 border-t-blue-600 space-y-4">
                     <h2 class="text-base font-bold text-gray-800 flex items-center space-x-2 google-sans">
@@ -239,11 +257,11 @@
                     </div>
                 </div>
 
-                <!-- Security & Access Passcode Settings + Google Sheets Webhook -->
+                <!-- Security & Access Passcode Settings -->
                 <div class="google-card p-5 border-t-4 border-t-amber-500 space-y-4">
                     <h2 class="text-base font-bold text-gray-800 flex items-center space-x-2 google-sans">
                         <span class="material-symbols-outlined text-amber-500">vpn_key</span>
-                        <span>Passcode & Google Sheet Integration</span>
+                        <span>Passcode Key Management</span>
                     </h2>
 
                     <!-- Viewer Passcode Setting -->
@@ -255,15 +273,6 @@
                         </div>
                     </div>
 
-                    <!-- Optional Google Sheets Sync URL -->
-                    <div class="border-b pb-3 space-y-2">
-                        <label class="block text-xs font-semibold text-gray-700">Google Apps Script Web App URL (Optional Sync)</label>
-                        <div class="flex space-x-2">
-                            <input type="url" x-model="googleSheetUrl" placeholder="https://script.google.com/macros/s/..." class="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                            <button @click="saveGoogleSheetUrl()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-3 py-1.5 rounded-md transition">Save Sheet</button>
-                        </div>
-                    </div>
-
                     <!-- Owner Passcode Keys -->
                     <div class="space-y-2">
                         <label class="block text-xs font-semibold text-gray-700">Owner Passcode Key(s)</label>
@@ -272,7 +281,7 @@
                             <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs px-3 py-1.5 rounded-md transition">Add Key</button>
                         </form>
 
-                        <div class="space-y-1 max-h-20 overflow-y-auto pt-1">
+                        <div class="space-y-1 max-h-24 overflow-y-auto pt-1">
                             <template x-for="(key, index) in ownerKeys" :key="index">
                                 <div class="flex items-center justify-between px-2 py-1 bg-amber-50 rounded border border-amber-200 text-xs">
                                     <span class="font-mono text-amber-900" x-text="'🔒 ' + key"></span>
@@ -293,22 +302,23 @@
                 <div class="flex items-center space-x-2">
                     <span class="material-symbols-outlined text-gray-600">history</span>
                     <h2 class="text-base font-bold text-gray-800 google-sans">Borrower Transaction Logs</h2>
-                    <span class="bg-gray-200 text-gray-700 text-xs px-2 py-0.5 rounded-full font-bold" x-text="transactionLogs.length"></span>
+                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full font-bold" x-text="transactionLogs.length"></span>
                 </div>
-                <div class="flex items-center space-x-2">
+                <div class="flex items-center space-x-3">
                     <button x-show="mode === 'owner' && transactionLogs.length > 0" 
                             @click.stop="confirmClearAllLogs()" 
                             class="bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 text-xs font-semibold px-2.5 py-1 rounded-md transition flex items-center space-x-1">
                         <span class="material-symbols-outlined text-sm">delete_sweep</span>
                         <span>Clear All Logs</span>
                     </button>
-                    <button class="text-gray-500 hover:text-gray-700 transition">
+                    <div class="flex items-center space-x-1 text-xs text-blue-600 font-medium">
+                        <span x-text="logsExpanded ? 'Hide Logs' : 'Show Logs'"></span>
                         <span class="material-symbols-outlined text-xl" x-text="logsExpanded ? 'expand_less' : 'expand_more'"></span>
-                    </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Collapsible Body -->
+            <!-- Collapsible Table Section -->
             <div x-show="logsExpanded" x-transition class="overflow-x-auto pt-1">
                 <table class="w-full text-left text-xs text-gray-600">
                     <thead class="bg-gray-100 text-gray-700 font-semibold uppercase tracking-wider border-b">
@@ -360,15 +370,15 @@
                 </div>
 
                 <!-- Controls: Filter & Search -->
-                <div class="flex items-center space-x-3">
+                <div class="flex flex-wrap items-center gap-3">
                     <div class="bg-gray-100 p-1 rounded-lg flex text-xs font-medium">
                         <button @click="filterStatus = 'all'" :class="filterStatus === 'all' ? 'bg-white shadow text-blue-600' : 'text-gray-600'" class="px-3 py-1 rounded-md transition">All</button>
                         <button @click="filterStatus = 'available'" :class="filterStatus === 'available' ? 'bg-white shadow text-blue-600' : 'text-gray-600'" class="px-3 py-1 rounded-md transition">Available</button>
                         <button @click="filterStatus = 'out'" :class="filterStatus === 'out' ? 'bg-white shadow text-blue-600' : 'text-gray-600'" class="px-3 py-1 rounded-md transition">Out of Stock</button>
                     </div>
-                    <div class="relative">
+                    <div class="relative flex-1 sm:flex-none">
                         <span class="material-symbols-outlined absolute left-2.5 top-2 text-gray-400 text-sm">search</span>
-                        <input type="text" x-model="searchQuery" placeholder="Search title or author..." class="pl-8 pr-3 py-1.5 border border-gray-300 rounded-md text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none w-48">
+                        <input type="text" x-model="searchQuery" placeholder="Search title or author..." class="pl-8 pr-3 py-1.5 border border-gray-300 rounded-md text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none w-full sm:w-48">
                     </div>
                 </div>
             </div>
@@ -465,7 +475,7 @@
             <div class="space-y-3 text-xs text-gray-600 leading-relaxed max-h-96 overflow-y-auto">
                 <p><strong>Viewer Mode:</strong> Allows users to select their name and borrow or return book copies.</p>
                 <p><strong>Owner Mode:</strong> Protects inventory management. Add new books, update stock counts, view/clear logs, and manage passcodes.</p>
-                <p><strong>Google Sheet Sync:</strong> Option to paste an Apps Script WebApp URL to permanently store all transaction entries on Google Sheets.</p>
+                <p><strong>Mobile/Desktop Toggle:</strong> Switch view modes using the top-right header icon to optimize screen layout for small devices.</p>
             </div>
             <div class="text-right pt-2 border-t">
                 <button @click="showGuideModal = false" class="google-blue-btn font-medium px-4 py-2 rounded-md text-xs">Got it</button>
@@ -515,12 +525,12 @@
         function bookInventoryApp() {
             return {
                 mode: 'viewer',
+                viewportMode: 'desktop',
                 viewerAuthenticated: false,
                 viewerPasscode: 'read26',
                 viewerPassInput: '',
                 ownerKeys: ['LA2627'],
                 tempViewerCode: 'read26',
-                googleSheetUrl: '',
                 newOwnerKeyInput: '',
                 showAuthModal: false,
                 showGuideModal: false,
@@ -564,9 +574,6 @@
                         this.tempViewerCode = savedViewerCode;
                     }
 
-                    const savedSheetUrl = localStorage.getItem('wwp_sheet_url');
-                    if (savedSheetUrl) this.googleSheetUrl = savedSheetUrl;
-
                     const savedLogs = localStorage.getItem('wwp_logs');
                     if (savedLogs) this.transactionLogs = JSON.parse(savedLogs);
                 },
@@ -576,7 +583,6 @@
                     localStorage.setItem('wwp_borrowers', JSON.stringify(this.borrowerNames));
                     localStorage.setItem('wwp_owner_keys', JSON.stringify(this.ownerKeys));
                     localStorage.setItem('wwp_viewer_code', this.viewerPasscode);
-                    localStorage.setItem('wwp_sheet_url', this.googleSheetUrl);
                     localStorage.setItem('wwp_logs', JSON.stringify(this.transactionLogs));
                 },
 
@@ -622,11 +628,6 @@
                     this.viewerPasscode = this.tempViewerCode.trim();
                     this.saveData();
                     this.showNotification('Viewer Access Code updated!');
-                },
-
-                saveGoogleSheetUrl() {
-                    this.saveData();
-                    this.showNotification('Google Sheet Webhook URL saved!');
                 },
 
                 addOwnerKey() {
@@ -786,17 +787,6 @@
                     };
 
                     this.transactionLogs.unshift(newLog);
-
-                    // Send to Google Sheets if Webhook URL is set
-                    if (this.googleSheetUrl && this.googleSheetUrl.startsWith('http')) {
-                        fetch(this.googleSheetUrl, {
-                            method: 'POST',
-                            mode: 'no-cors',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(newLog)
-                        }).catch(err => console.log('Google Sheets sync error:', err));
-                    }
-
                     this.viewerForm = { borrowerName: '', customBorrowerName: '', bookId: '', quantity: 1 };
                     this.saveData();
                 },
