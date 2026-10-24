@@ -239,11 +239,11 @@
                     </div>
                 </div>
 
-                <!-- Security & Access Passcode Settings -->
+                <!-- Security & Access Passcode Settings + Google Sheets Webhook -->
                 <div class="google-card p-5 border-t-4 border-t-amber-500 space-y-4">
                     <h2 class="text-base font-bold text-gray-800 flex items-center space-x-2 google-sans">
                         <span class="material-symbols-outlined text-amber-500">vpn_key</span>
-                        <span>Passcode & Key Management</span>
+                        <span>Passcode & Google Sheet Integration</span>
                     </h2>
 
                     <!-- Viewer Passcode Setting -->
@@ -255,6 +255,15 @@
                         </div>
                     </div>
 
+                    <!-- Optional Google Sheets Sync URL -->
+                    <div class="border-b pb-3 space-y-2">
+                        <label class="block text-xs font-semibold text-gray-700">Google Apps Script Web App URL (Optional Sync)</label>
+                        <div class="flex space-x-2">
+                            <input type="url" x-model="googleSheetUrl" placeholder="https://script.google.com/macros/s/..." class="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                            <button @click="saveGoogleSheetUrl()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-3 py-1.5 rounded-md transition">Save Sheet</button>
+                        </div>
+                    </div>
+
                     <!-- Owner Passcode Keys -->
                     <div class="space-y-2">
                         <label class="block text-xs font-semibold text-gray-700">Owner Passcode Key(s)</label>
@@ -263,8 +272,7 @@
                             <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs px-3 py-1.5 rounded-md transition">Add Key</button>
                         </form>
 
-                        <div class="space-y-1 max-h-24 overflow-y-auto pt-1">
-                            <label class="block text-[10px] text-gray-400 uppercase font-bold">Active Owner Keys:</label>
+                        <div class="space-y-1 max-h-20 overflow-y-auto pt-1">
                             <template x-for="(key, index) in ownerKeys" :key="index">
                                 <div class="flex items-center justify-between px-2 py-1 bg-amber-50 rounded border border-amber-200 text-xs">
                                     <span class="font-mono text-amber-900" x-text="'🔒 ' + key"></span>
@@ -277,45 +285,67 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Transaction Activity Logs -->
-            <div class="google-card p-5">
-                <h2 class="text-base font-bold text-gray-800 mb-3 flex items-center space-x-2 google-sans">
+        <!-- COLLAPSIBLE TRANSACTION LOGS CARD -->
+        <div class="google-card p-5 space-y-3">
+            <div class="flex items-center justify-between border-b pb-3 cursor-pointer select-none" @click="logsExpanded = !logsExpanded">
+                <div class="flex items-center space-x-2">
                     <span class="material-symbols-outlined text-gray-600">history</span>
-                    <span>Borrower Transaction Logs</span>
-                </h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs text-gray-600">
-                        <thead class="bg-gray-100 text-gray-700 font-semibold uppercase tracking-wider border-b">
-                            <tr>
-                                <th class="py-2.5 px-3">Date & Time</th>
-                                <th class="py-2.5 px-3">Borrower Name</th>
-                                <th class="py-2.5 px-3">Book Title</th>
-                                <th class="py-2.5 px-3">Action</th>
-                                <th class="py-2.5 px-3">Copies</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            <template x-for="log in transactionLogs" :key="log.id">
-                                <tr class="hover:bg-gray-50">
-                                    <td class="py-2 px-3 whitespace-nowrap" x-text="log.timestamp"></td>
-                                    <td class="py-2 px-3 font-semibold text-gray-800" x-text="log.borrowerName"></td>
-                                    <td class="py-2 px-3" x-text="log.bookTitle"></td>
-                                    <td class="py-2 px-3">
-                                        <span :class="log.action === 'take' ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800'" 
-                                              class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase" x-text="log.action"></span>
-                                    </td>
-                                    <td class="py-2 px-3 font-bold" x-text="log.quantity"></td>
-                                </tr>
-                            </template>
-                            <template x-if="transactionLogs.length === 0">
-                                <tr>
-                                    <td colspan="5" class="py-4 text-center text-gray-400">No transaction logs recorded yet.</td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table>
+                    <h2 class="text-base font-bold text-gray-800 google-sans">Borrower Transaction Logs</h2>
+                    <span class="bg-gray-200 text-gray-700 text-xs px-2 py-0.5 rounded-full font-bold" x-text="transactionLogs.length"></span>
                 </div>
+                <div class="flex items-center space-x-2">
+                    <button x-show="mode === 'owner' && transactionLogs.length > 0" 
+                            @click.stop="confirmClearAllLogs()" 
+                            class="bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 text-xs font-semibold px-2.5 py-1 rounded-md transition flex items-center space-x-1">
+                        <span class="material-symbols-outlined text-sm">delete_sweep</span>
+                        <span>Clear All Logs</span>
+                    </button>
+                    <button class="text-gray-500 hover:text-gray-700 transition">
+                        <span class="material-symbols-outlined text-xl" x-text="logsExpanded ? 'expand_less' : 'expand_more'"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Collapsible Body -->
+            <div x-show="logsExpanded" x-transition class="overflow-x-auto pt-1">
+                <table class="w-full text-left text-xs text-gray-600">
+                    <thead class="bg-gray-100 text-gray-700 font-semibold uppercase tracking-wider border-b">
+                        <tr>
+                            <th class="py-2.5 px-3">Date & Time</th>
+                            <th class="py-2.5 px-3">Borrower Name</th>
+                            <th class="py-2.5 px-3">Book Title</th>
+                            <th class="py-2.5 px-3">Action</th>
+                            <th class="py-2.5 px-3">Copies</th>
+                            <th x-show="mode === 'owner'" class="py-2.5 px-3 text-center">Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <template x-for="log in transactionLogs" :key="log.id">
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-2 px-3 whitespace-nowrap" x-text="log.timestamp"></td>
+                                <td class="py-2 px-3 font-semibold text-gray-800" x-text="log.borrowerName"></td>
+                                <td class="py-2 px-3" x-text="log.bookTitle"></td>
+                                <td class="py-2 px-3">
+                                    <span :class="log.action === 'take' ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800'" 
+                                          class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase" x-text="log.action"></span>
+                                </td>
+                                <td class="py-2 px-3 font-bold" x-text="log.quantity"></td>
+                                <td x-show="mode === 'owner'" class="py-2 px-3 text-center">
+                                    <button @click="confirmDeleteLog(log)" class="text-gray-400 hover:text-red-600 transition">
+                                        <span class="material-symbols-outlined text-base">delete</span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                        <template x-if="transactionLogs.length === 0">
+                            <tr>
+                                <td colspan="6" class="py-4 text-center text-gray-400">No transaction logs recorded yet.</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -434,8 +464,8 @@
             </div>
             <div class="space-y-3 text-xs text-gray-600 leading-relaxed max-h-96 overflow-y-auto">
                 <p><strong>Viewer Mode:</strong> Allows users to select their name and borrow or return book copies.</p>
-                <p><strong>Owner Mode:</strong> Protects inventory management. Add new books, update stock counts, view transaction logs, and adjust access passcodes.</p>
-                <p><strong>Passcode Keys:</strong> Passcode keys are managed inside Owner Mode settings.</p>
+                <p><strong>Owner Mode:</strong> Protects inventory management. Add new books, update stock counts, view/clear logs, and manage passcodes.</p>
+                <p><strong>Google Sheet Sync:</strong> Option to paste an Apps Script WebApp URL to permanently store all transaction entries on Google Sheets.</p>
             </div>
             <div class="text-right pt-2 border-t">
                 <button @click="showGuideModal = false" class="google-blue-btn font-medium px-4 py-2 rounded-md text-xs">Got it</button>
@@ -472,13 +502,11 @@
             <div class="h-12 w-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto">
                 <span class="material-symbols-outlined text-2xl">delete</span>
             </div>
-            <h3 class="font-bold text-gray-800 text-base google-sans">Delete Book Title?</h3>
-            <p class="text-xs text-gray-500">
-                Are you sure you want to delete <span class="font-bold text-gray-800" x-text="bookToDelete ? bookToDelete.title : ''"></span> from the inventory?
-            </p>
+            <h3 class="font-bold text-gray-800 text-base google-sans" x-text="deleteModalTitle"></h3>
+            <p class="text-xs text-gray-500" x-text="deleteModalMessage"></p>
             <div class="flex space-x-2 pt-2">
-                <button @click="showDeleteModal = false; bookToDelete = null;" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 rounded-md text-xs transition">Cancel</button>
-                <button @click="executeDeleteBook()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2 rounded-md text-xs transition">Delete</button>
+                <button @click="showDeleteModal = false" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 rounded-md text-xs transition">Cancel</button>
+                <button @click="executeDeleteAction()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2 rounded-md text-xs transition">Confirm Delete</button>
             </div>
         </div>
     </div>
@@ -492,11 +520,16 @@
                 viewerPassInput: '',
                 ownerKeys: ['LA2627'],
                 tempViewerCode: 'read26',
+                googleSheetUrl: '',
                 newOwnerKeyInput: '',
                 showAuthModal: false,
                 showGuideModal: false,
                 showDeleteModal: false,
-                bookToDelete: null,
+                logsExpanded: false,
+                deleteType: '',
+                itemToDelete: null,
+                deleteModalTitle: '',
+                deleteModalMessage: '',
                 authPassInput: '',
                 searchQuery: '',
                 filterStatus: 'all',
@@ -531,6 +564,9 @@
                         this.tempViewerCode = savedViewerCode;
                     }
 
+                    const savedSheetUrl = localStorage.getItem('wwp_sheet_url');
+                    if (savedSheetUrl) this.googleSheetUrl = savedSheetUrl;
+
                     const savedLogs = localStorage.getItem('wwp_logs');
                     if (savedLogs) this.transactionLogs = JSON.parse(savedLogs);
                 },
@@ -540,6 +576,7 @@
                     localStorage.setItem('wwp_borrowers', JSON.stringify(this.borrowerNames));
                     localStorage.setItem('wwp_owner_keys', JSON.stringify(this.ownerKeys));
                     localStorage.setItem('wwp_viewer_code', this.viewerPasscode);
+                    localStorage.setItem('wwp_sheet_url', this.googleSheetUrl);
                     localStorage.setItem('wwp_logs', JSON.stringify(this.transactionLogs));
                 },
 
@@ -585,6 +622,11 @@
                     this.viewerPasscode = this.tempViewerCode.trim();
                     this.saveData();
                     this.showNotification('Viewer Access Code updated!');
+                },
+
+                saveGoogleSheetUrl() {
+                    this.saveData();
+                    this.showNotification('Google Sheet Webhook URL saved!');
                 },
 
                 addOwnerKey() {
@@ -647,18 +689,43 @@
                 },
 
                 confirmDeleteBook(book) {
-                    this.bookToDelete = book;
+                    this.deleteType = 'book';
+                    this.itemToDelete = book;
+                    this.deleteModalTitle = 'Delete Book Title?';
+                    this.deleteModalMessage = `Are you sure you want to delete "${book.title}" from inventory?`;
                     this.showDeleteModal = true;
                 },
 
-                executeDeleteBook() {
-                    if (this.bookToDelete) {
-                        this.books = this.books.filter(b => b.id !== this.bookToDelete.id);
-                        this.saveData();
+                confirmDeleteLog(log) {
+                    this.deleteType = 'log';
+                    this.itemToDelete = log;
+                    this.deleteModalTitle = 'Delete Log Entry?';
+                    this.deleteModalMessage = `Delete transaction log for "${log.borrowerName}" (${log.bookTitle})?`;
+                    this.showDeleteModal = true;
+                },
+
+                confirmClearAllLogs() {
+                    this.deleteType = 'clearAllLogs';
+                    this.itemToDelete = null;
+                    this.deleteModalTitle = 'Clear All Logs?';
+                    this.deleteModalMessage = 'Are you sure you want to delete ALL transaction activity logs?';
+                    this.showDeleteModal = true;
+                },
+
+                executeDeleteAction() {
+                    if (this.deleteType === 'book' && this.itemToDelete) {
+                        this.books = this.books.filter(b => b.id !== this.itemToDelete.id);
                         this.showNotification('Book deleted');
+                    } else if (this.deleteType === 'log' && this.itemToDelete) {
+                        this.transactionLogs = this.transactionLogs.filter(l => l.id !== this.itemToDelete.id);
+                        this.showNotification('Log entry removed');
+                    } else if (this.deleteType === 'clearAllLogs') {
+                        this.transactionLogs = [];
+                        this.showNotification('All transaction logs cleared');
                     }
+                    this.saveData();
                     this.showDeleteModal = false;
-                    this.bookToDelete = null;
+                    this.itemToDelete = null;
                 },
 
                 processViewerTransaction(type) {
@@ -709,14 +776,26 @@
                         this.showNotification(`Returned ${qty} copy(ies)`);
                     }
 
-                    this.transactionLogs.unshift({
+                    const newLog = {
                         id: Date.now(),
                         timestamp: new Date().toLocaleString(),
                         borrowerName: borrower,
                         bookTitle: book.title,
                         action: type,
                         quantity: qty
-                    });
+                    };
+
+                    this.transactionLogs.unshift(newLog);
+
+                    // Send to Google Sheets if Webhook URL is set
+                    if (this.googleSheetUrl && this.googleSheetUrl.startsWith('http')) {
+                        fetch(this.googleSheetUrl, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(newLog)
+                        }).catch(err => console.log('Google Sheets sync error:', err));
+                    }
 
                     this.viewerForm = { borrowerName: '', customBorrowerName: '', bookId: '', quantity: 1 };
                     this.saveData();
