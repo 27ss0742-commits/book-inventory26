@@ -45,7 +45,7 @@
             <div class="flex items-center space-x-3">
                 <div class="h-10 w-10 flex items-center justify-center rounded-lg bg-blue-50 overflow-hidden border border-blue-100 p-0.5">
                     <img src="4866.png" 
-                         alt="Blue Knights Logo" 
+                         alt="WW-P North Logo" 
                          class="h-full w-full object-contain"
                          onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/google/material-design-icons/master/png/action/book/2x/baseline_book_black_24dp.png';" />
                 </div>
@@ -106,7 +106,7 @@
             <div x-show="!viewerAuthenticated" class="max-w-md mx-auto google-card p-8 my-12 text-center space-y-4">
                 <div class="h-16 w-16 bg-blue-50 border border-blue-100 rounded-full flex items-center justify-center mx-auto p-2">
                     <img src="4866.png" 
-                         alt="Blue Knights Logo" 
+                         alt="WW-P North Logo" 
                          class="h-full w-full object-contain" 
                          onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/google/material-design-icons/master/png/action/book/2x/baseline_book_black_24dp.png';"/>
                 </div>
@@ -402,7 +402,7 @@
                                         <button @click="adjustTotalCopies(book, -1)" title="Remove Copy" class="p-1 text-gray-600 hover:text-amber-600 transition">
                                             <span class="material-symbols-outlined text-base">remove_circle</span>
                                         </button>
-                                        <button @click="deleteBook(book)" title="Delete Title" class="p-1 text-gray-400 hover:text-red-600 transition ml-2">
+                                        <button @click="confirmDeleteBook(book)" title="Delete Title" class="p-1 text-gray-400 hover:text-red-600 transition ml-2">
                                             <span class="material-symbols-outlined text-base">delete</span>
                                         </button>
                                     </div>
@@ -448,7 +448,7 @@
         <div class="bg-white rounded-lg max-w-sm w-full p-6 space-y-4 shadow-xl text-center">
             <div class="h-12 w-12 bg-blue-50 border border-blue-100 rounded-full flex items-center justify-center mx-auto p-1.5">
                 <img src="4866.png" 
-                     alt="Blue Knights Logo" 
+                     alt="WW-P North Logo" 
                      class="h-full w-full object-contain"
                      onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/google/material-design-icons/master/png/action/book/2x/baseline_book_black_24dp.png';" />
             </div>
@@ -466,6 +466,23 @@
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal (Iframe-safe) -->
+    <div x-show="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" x-cloak>
+        <div class="bg-white rounded-lg max-w-sm w-full p-6 space-y-4 shadow-xl text-center">
+            <div class="h-12 w-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto">
+                <span class="material-symbols-outlined text-2xl">delete</span>
+            </div>
+            <h3 class="font-bold text-gray-800 text-base google-sans">Delete Book Title?</h3>
+            <p class="text-xs text-gray-500">
+                Are you sure you want to delete <span class="font-bold text-gray-800" x-text="bookToDelete ? bookToDelete.title : ''"></span> from the inventory?
+            </p>
+            <div class="flex space-x-2 pt-2">
+                <button @click="showDeleteModal = false; bookToDelete = null;" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 rounded-md text-xs transition">Cancel</button>
+                <button @click="executeDeleteBook()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2 rounded-md text-xs transition">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         function bookInventoryApp() {
             return {
@@ -478,6 +495,8 @@
                 newOwnerKeyInput: '',
                 showAuthModal: false,
                 showGuideModal: false,
+                showDeleteModal: false,
+                bookToDelete: null,
                 authPassInput: '',
                 searchQuery: '',
                 filterStatus: 'all',
@@ -489,7 +508,7 @@
                 viewerForm: { borrowerName: '', customBorrowerName: '', bookId: '', quantity: 1 },
 
                 books: [
-                    { id: 1, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', totalCopies: 5, availableCopies: 3, checkedOutCopies: 2, borrowers: { 'Alex Johnson': 2 } },
+                    { id: 1, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', totalCopies: 5, availableCopies: 5, checkedOutCopies: 0, borrowers: {} },
                     { id: 2, title: '1984', author: 'George Orwell', totalCopies: 8, availableCopies: 8, checkedOutCopies: 0, borrowers: {} },
                     { id: 3, title: 'Clean Code', author: 'Robert C. Martin', totalCopies: 4, availableCopies: 1, checkedOutCopies: 3, borrowers: { 'Beatriz Silva': 2, 'Carlos Mendez': 1 } },
                     { id: 4, title: 'To Kill a Mockingbird', author: 'Harper Lee', totalCopies: 6, availableCopies: 4, checkedOutCopies: 2, borrowers: { 'Diana Prince': 2 } }
@@ -627,12 +646,19 @@
                     this.saveData();
                 },
 
-                deleteBook(book) {
-                    if (confirm(`Are you sure you want to delete "${book.title}"?`)) {
-                        this.books = this.books.filter(b => b.id !== book.id);
+                confirmDeleteBook(book) {
+                    this.bookToDelete = book;
+                    this.showDeleteModal = true;
+                },
+
+                executeDeleteBook() {
+                    if (this.bookToDelete) {
+                        this.books = this.books.filter(b => b.id !== this.bookToDelete.id);
                         this.saveData();
                         this.showNotification('Book deleted');
                     }
+                    this.showDeleteModal = false;
+                    this.bookToDelete = null;
                 },
 
                 processViewerTransaction(type) {
