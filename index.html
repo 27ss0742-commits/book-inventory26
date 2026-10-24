@@ -3,585 +3,715 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Book Inventory Prototype</title>
+    <title>Google Book Inventory Management - WW-P High School North</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts & Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     <style>
-        :root {
-            --primary: #1a73e8;
-            --primary-hover: #1557b0;
-            --bg-light: #f8f9fa;
-            --border-color: #dadce0;
-            --text-dark: #202124;
-            --text-muted: #5f6368;
-        }
-
-        * {
-            box-sizing: border-box;
-            font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
-            background-color: #ffffff;
-            color: var(--text-dark);
-            padding: 20px;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f8f9fa;
         }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
+        h1, h2, h3, .google-sans {
+            font-family: 'Google Sans', 'Roboto', sans-serif;
         }
-
-        /* Header Styles */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 30px;
-        }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .avatar {
-            background-color: var(--primary);
-            color: white;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .logo-title {
-            font-size: 22px;
-            font-weight: 400;
-        }
-
-        .logo-title strong {
-            font-weight: 500;
-        }
-
-        .badge {
-            background-color: #e8f0fe;
-            color: var(--primary);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .mode-toggle {
-            display: flex;
-            gap: 8px;
-            background-color: var(--bg-light);
-            padding: 4px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-
-        .mode-btn {
-            padding: 6px 14px;
-            border: none;
-            background: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .mode-btn.active {
-            background-color: var(--primary);
+        .google-blue-btn {
+            background-color: #1a73e8;
             color: white;
         }
-
-        /* Main Sections */
-        .section-card {
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 24px;
-            margin-bottom: 24px;
-            background-color: #ffffff;
+        .google-blue-btn:hover {
+            background-color: #1557b0;
         }
-
-        .owner-only {
-            display: block;
+        .google-card {
+            background: #ffffff;
+            border: 1px solid #dadce0;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.1), 0 1px 3px 1px rgba(60,64,67,0.05);
         }
-
-        body.viewer-mode-active .owner-only {
-            display: none !important;
-        }
-
-        /* Form Controls */
-        .input-group {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        input[type="text"] {
-            flex: 1;
-            padding: 10px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 14px;
-            outline: none;
-        }
-
-        input[type="text"]:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-
-        .btn-primary {
-            background-color: #a020f0;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #8018c0;
-        }
-
-        .btn-blue {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-blue:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .btn-orange {
-            background-color: #e67e22;
-            color: white;
-        }
-
-        .btn-orange:hover {
-            background-color: #d35400;
-        }
-
-        /* List Items */
-        .list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            margin-bottom: 8px;
-            background-color: #white;
-        }
-
-        .remove-item-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 16px;
-            padding: 0 4px;
-        }
-
-        .remove-item-btn:hover {
-            color: #d93025;
-        }
-
-        /* Inventory Table Layout */
-        .table-container {
-            overflow-x: auto;
-            margin-top: 15px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 14px;
-        }
-
-        th {
-            background-color: var(--bg-light);
-            color: var(--text-muted);
-            font-weight: 500;
-            padding: 12px 16px;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        td {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--border-color);
-            vertical-align: middle;
-        }
-
-        .stock-bar-container {
-            width: 120px;
-            background-color: #f1f3f4;
-            height: 8px;
-            border-radius: 4px;
-            overflow: hidden;
-            display: inline-block;
-            margin-right: 8px;
-            vertical-align: middle;
-        }
-
-        .stock-bar {
-            height: 100%;
-            background-color: #1e8e3e;
-            width: 100%;
-            transition: width 0.3s, background-color 0.3s;
-        }
-
-        .stock-bar.low {
-            background-color: #f9ab00;
-        }
-
-        .stock-bar.out {
-            background-color: #d93025;
-            width: 0% !important;
-        }
-
-        .action-icon-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            padding: 4px 8px;
-            color: var(--text-muted);
-            border-radius: 4px;
-        }
-
-        .action-icon-btn:hover:not(:disabled) {
-            background-color: #f1f3f4;
-            color: var(--text-dark);
-        }
-
-        .action-icon-btn:disabled {
-            color: #c1c4c8;
-            cursor: not-allowed;
-        }
-
-        .trash-btn:hover:not(:disabled) {
-            color: #d93025;
-            background-color: #fce8e6;
-        }
-
-        /* Management Panel Specific Colors */
-        .mgmt-card {
-            border-top: 4px solid #f1c40f;
-        }
-
-        .mgmt-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 20px;
-        }
-
-        .active-keys {
-            margin-top: 15px;
-            font-size: 12px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .key-tag {
-            display: inline-flex;
-            align-items: center;
-            background-color: #fef7e0;
-            color: #b06000;
-            padding: 4px 8px;
-            border-radius: 4px;
-            margin-top: 6px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
-<body>
+<body class="text-gray-800 antialiased min-h-screen flex flex-col" x-data="bookInventoryApp()">
 
-<div class="container">
-    <!-- Header Controls -->
-    <header>
-        <div class="logo-area">
-            <div class="avatar">WW-P</div>
-            <h1 class="logo-title">Google <strong>Book Inventory</strong></h1>
-            <span class="badge">WW-P North</span>
-        </div>
-        <div class="mode-toggle">
-            <button class="mode-btn" id="viewerModeBtn" onclick="setMode('viewer')">👁️ Viewer Mode</button>
-            <button class="mode-btn active" id="ownerModeBtn" onclick="setMode('owner')">🔒 Owner Mode</button>
-        </div>
-    </header>
-
-    <!-- Book Inventory Table Section -->
-    <div class="section-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h2 style="font-size: 18px; font-weight: 500;">Book Stock Management</h2>
-            <button class="btn btn-primary owner-only" onclick="addSampleBook()" style="padding: 6px 12px; font-size: 12px;">+ Add 1984 Fast</button>
-        </div>
-        
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Book Title</th>
-                        <th>Available</th>
-                        <th>Checked Out</th>
-                        <th>Stock Availability</th>
-                        <th class="owner-only">Owner Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="inventoryTableBody">
-                    <!-- Dynamic rows populate here -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Active Borrowers / Users Section -->
-    <div class="section-card owner-only">
-        <h2 style="font-size: 16px; font-weight: 500; margin-bottom: 15px;">Authorized System Names</h2>
-        <div class="input-group">
-            <input type="text" id="nameInput" placeholder="Enter full name...">
-            <button class="btn btn-primary" onclick="addName()">+ Add</button>
-        </div>
-        <div id="namesListContainer">
-            <!-- Dynamic names item list -->
-        </div>
-    </div>
-
-    <!-- Passcode & Key Management Section -->
-    <div class="section-card mgmt-card owner-only">
-        <div class="mgmt-title">🔑 Passcode & Key Management</div>
-        
-        <div style="margin-bottom: 20px;">
-            <label style="display:block; font-size:13px; color:var(--text-muted); margin-bottom:6px;">Viewer Mode Access Code</label>
-            <div class="input-group" style="margin-bottom:0;">
-                <input type="text" id="viewerCodeInput" value="read26">
-                <button class="btn btn-blue" onclick="updateViewerCode()">Update Code</button>
+    <!-- Header / Navbar -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand / Logo -->
+            <div class="flex items-center space-x-3">
+                <div class="h-10 w-10 flex items-center justify-center rounded-lg bg-blue-50 overflow-hidden border border-blue-100 p-0.5">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/thumb/e/e6/West_Windsor-Plainsboro_High_School_North_logo.png/220px-West_Windsor-Plainsboro_High_School_North_logo.png" 
+                         alt="Blue Knights Logo" 
+                         class="h-full w-full object-contain"
+                         onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/google/material-design-icons/master/png/action/book/2x/baseline_book_black_24dp.png';" />
+                </div>
+                <div>
+                    <span class="text-xl font-medium text-gray-700 google-sans">Google <span class="font-bold text-gray-900">Book Inventory</span></span>
+                    <span class="ml-2 px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-semibold rounded-full border border-blue-200">WW-P North</span>
+                </div>
             </div>
-        </div>
 
-        <div>
-            <label style="display:block; font-size:13px; color:var(--text-muted); margin-bottom:6px;">Owner Passcode Key(s)</label>
-            <div class="input-group" style="margin-bottom:0;">
-                <input type="text" id="ownerKeyInput" placeholder="New key...">
-                <button class="btn btn-orange" onclick="addOwnerKey()">Add Key</button>
-            </div>
-            <div class="active-keys">
-                ACTIVE OWNER KEYS:
-                <div id="keysContainer">
-                    <!-- Dynamic tags -->
+            <!-- Controls Header Right -->
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <!-- Help Guide Modal Toggle -->
+                <button @click="showGuideModal = true" class="flex items-center space-x-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 transition">
+                    <span class="material-symbols-outlined text-base">help_outline</span>
+                    <span class="hidden sm:inline">Guide</span>
+                </button>
+
+                <!-- Mode Switcher Pill -->
+                <div class="bg-gray-100 p-1 rounded-full border border-gray-200 flex items-center text-xs font-medium">
+                    <button @click="switchToViewer()" 
+                            :class="mode === 'viewer' ? 'bg-white text-blue-600 shadow-sm font-semibold' : 'text-gray-600 hover:text-gray-900'"
+                            class="px-3 py-1 rounded-full transition-all flex items-center space-x-1">
+                        <span class="material-symbols-outlined text-sm">visibility</span>
+                        <span>Viewer Mode</span>
+                    </button>
+                    <button @click="requestOwnerAccess()" 
+                            :class="mode === 'owner' ? 'bg-blue-600 text-white shadow-sm font-semibold' : 'text-gray-600 hover:text-gray-900'"
+                            class="px-3 py-1 rounded-full transition-all flex items-center space-x-1">
+                        <span class="material-symbols-outlined text-sm">enhanced_encryption</span>
+                        <span>Owner Mode</span>
+                    </button>
                 </div>
             </div>
         </div>
-    </div>
-</div>
+    </header>
 
-<script>
-    // --- STATE INITIALIZATION & LOCALSTORAGE MANAGEMENT ---
-    
-    // Default system seed values if storage is totally empty
-    const DEFAULT_BOOKS = [
-        { id: "b1", title: "1984", available: 8, checkedOut: 0 },
-        { id: "b2", title: "To Kill a Mockingbird", available: 4, checkedOut: 2 },
-        { id: "b3", title: "The Great Gatsby", available: 0, checkedOut: 5 }
-    ];
+    <!-- Main Workspace -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow space-y-6 w-full">
 
-    const DEFAULT_NAMES = ["Alex Johnson", "Beatriz Silva", "Carlos Mendez", "Diana Prince"];
-    const DEFAULT_KEYS = ["LA2627"];
+        <!-- Toast Alert Notification -->
+        <div x-show="toast.show" 
+             x-transition:enter="transition ease-out duration-300 transform"
+             x-transition:enter-start="opacity-0 -translate-y-2"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200 transform"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-2"
+             :class="toast.type === 'error' ? 'bg-red-600 text-white' : 'bg-gray-900 text-white'"
+             class="fixed bottom-5 right-5 z-50 px-4 py-3 rounded-lg shadow-lg text-sm flex items-center space-x-2"
+             x-cloak>
+            <span class="material-symbols-outlined text-base" x-text="toast.type === 'error' ? 'error' : 'check_circle'"></span>
+            <span x-text="toast.message"></span>
+        </div>
 
-    // State Objects
-    let state = {
-        mode: 'owner',
-        books: JSON.parse(localStorage.getItem('lib_books')) || DEFAULT_BOOKS,
-        names: JSON.parse(localStorage.getItem('lib_names')) || DEFAULT_NAMES,
-        viewerCode: localStorage.getItem('lib_viewercode') || 'read26',
-        ownerKeys: JSON.parse(localStorage.getItem('lib_ownerkeys')) || DEFAULT_KEYS
-    };
+        <!-- VIEWER MODE INTERFACE -->
+        <div x-show="mode === 'viewer'" x-cloak class="space-y-6">
+            <!-- Password Entry Card for Viewers -->
+            <div x-show="!viewerAuthenticated" class="max-w-md mx-auto google-card p-8 my-12 text-center space-y-4">
+                <div class="h-16 w-16 bg-blue-50 border border-blue-100 rounded-full flex items-center justify-center mx-auto p-2">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/thumb/e/e6/West_Windsor-Plainsboro_High_School_North_logo.png/220px-West_Windsor-Plainsboro_High_School_North_logo.png" 
+                         alt="Blue Knights Logo" 
+                         class="h-full w-full object-contain" 
+                         onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/google/material-design-icons/master/png/action/book/2x/baseline_book_black_24dp.png';"/>
+                </div>
+                <h2 class="text-lg font-bold text-gray-800 google-sans">Viewer Access Required</h2>
+                <p class="text-xs text-gray-500">Please enter the Viewer Access Code provided by your teacher or bookshelf manager to continue.</p>
+                <div class="space-y-3 pt-2">
+                    <input type="password" 
+                           x-model="viewerPassInput" 
+                           @keyup.enter="authenticateViewer()"
+                           placeholder="Enter Viewer Code" 
+                           class="w-full text-center tracking-widest text-lg px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <button @click="authenticateViewer()" class="w-full google-blue-btn font-medium py-2.5 px-4 rounded-lg shadow-sm transition flex items-center justify-center space-x-2">
+                        <span class="material-symbols-outlined text-sm">lock_open</span>
+                        <span>Access Library</span>
+                    </button>
+                </div>
+            </div>
 
-    // Helper to persist updates permanently
-    function saveState() {
-        localStorage.setItem('lib_books', JSON.stringify(state.books));
-        localStorage.setItem('lib_names', JSON.stringify(state.names));
-        localStorage.setItem('lib_viewercode', state.viewerCode);
-        localStorage.setItem('lib_ownerkeys', JSON.stringify(state.ownerKeys));
-    }
-
-    // --- VIEW INTERACTION & RENDERING LOGIC ---
-
-    function setMode(mode) {
-        state.mode = mode;
-        document.getElementById('viewerModeBtn').classList.toggle('active', mode === 'viewer');
-        document.getElementById('ownerModeBtn').classList.toggle('active', mode === 'owner');
-        
-        if(mode === 'viewer') {
-            document.body.classList.add('viewer-mode-active');
-        } else {
-            document.body.classList.remove('viewer-mode-active');
-        }
-        renderAll();
-    }
-
-    function renderAll() {
-        renderBooks();
-        renderNames();
-        renderKeys();
-    }
-
-    function renderBooks() {
-        const tbody = document.getElementById('inventoryTableBody');
-        tbody.innerHTML = '';
-
-        state.books.forEach(book => {
-            const total = book.available + book.checkedOut;
-            const pct = total > 0 ? Math.round((book.available / total) * 100) : 0;
-            
-            let barClass = '';
-            if (book.available === 0) barClass = 'out';
-            else if (pct <= 30) barClass = 'low';
-
-            // Constraint Check: Trash only functions if both fields are 0
-            const canDelete = (book.available === 0 && book.checkedOut === 0);
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="font-weight: 500;">\${book.title}</td>
-                <td>\${book.available}</td>
-                <td>\${book.checkedOut}</td>
-                <td>
-                    <div class="stock-bar-container">
-                        <div class="stock-bar \${barClass}" style="width: \${pct}%"></div>
+            <!-- Viewer Active Dashboard -->
+            <div x-show="viewerAuthenticated" class="google-card p-6 border-t-4 border-t-blue-600">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4 mb-6">
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2 google-sans">
+                            <span class="material-symbols-outlined text-blue-600">menu_book</span>
+                            <span>Borrow or Return a Book</span>
+                        </h1>
+                        <p class="text-xs text-gray-500 mt-0.5">Select your name, choose a book title, and select copies to checkout or return.</p>
                     </div>
-                    <span style="font-size:12px; color:var(--text-muted)">\${pct}% \${book.available === 0 ? '(Out of Stock)' : ''}</span>
-                </td>
-                <td class="owner-only">
-                    <button class="action-icon-btn" onclick="adjustStock('\${book.id}', 1)">➕</button>
-                    <button class="action-icon-btn" onclick="adjustStock('\${book.id}', -1)" \${book.available <= 0 ? 'disabled' : ''}>➖</button>
-                    <button class="action-icon-btn trash-btn" onclick="deleteBook('\${book.id}')" \${!canDelete ? 'disabled' : ''} title="\${canDelete ? 'Delete Book' : 'Cannot delete while stock or active loans exist'}">🗑️</button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
+                </div>
 
-    function renderNames() {
-        const container = document.getElementById('namesListContainer');
-        container.innerHTML = '';
-        state.names.forEach((name, idx) => {
-            const item = document.createElement('div');
-            item.className = 'list-item';
-            item.innerHTML = `
-                <span>\${name}</span>
-                <button class="remove-item-btn" onclick="removeName(\${idx})">×</button>
-            `;
-            container.appendChild(item);
-        });
-    }
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                    <!-- Step 1: Select Borrower Name -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">1. Borrower Name *</label>
+                        <select x-model="viewerForm.borrowerName" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="">-- Select Your Name --</option>
+                            <template x-for="name in borrowerNames" :key="name">
+                                <option :value="name" x-text="name"></option>
+                            </template>
+                            <option value="__NEW_USER__">+ Enter New Borrower Name...</option>
+                        </select>
+                        <div x-show="viewerForm.borrowerName === '__NEW_USER__'" class="mt-2">
+                            <input type="text" x-model="viewerForm.customBorrowerName" placeholder="Type your full name" class="w-full px-3 py-1.5 border border-blue-400 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                    </div>
 
-    function renderKeys() {
-        const container = document.getElementById('keysContainer');
-        container.innerHTML = '';
-        state.ownerKeys.forEach(key => {
-            const tag = document.createElement('span');
-            tag.className = 'key-tag';
-            tag.style.marginRight = '6px';
-            tag.innerHTML = `⚠️ \${key}`;
-            container.appendChild(tag);
-        });
-    }
+                    <!-- Step 2: Select Book -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">2. Select Book Title *</label>
+                        <select x-model="viewerForm.bookId" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="">-- Select a Title --</option>
+                            <template x-for="book in books" :key="book.id">
+                                <option :value="book.id" x-text="book.title + ' (' + book.availableCopies + ' available)'"></option>
+                            </template>
+                        </select>
+                    </div>
 
-    // --- DATA MUTATION ACTIONS ---
+                    <!-- Step 3: Quantity -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">3. Number of Copies *</label>
+                        <input type="number" min="1" x-model.number="viewerForm.quantity" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
 
-    function adjustStock(bookId, amount) {
-        const book = state.books.find(b => b.id === bookId);
-        if (book) {
-            book.available = Math.max(0, book.available + amount);
-            saveState();
-            renderBooks();
+                    <!-- Step 4: Submit Buttons -->
+                    <div class="flex space-x-2">
+                        <button @click="processViewerTransaction('take')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-3 rounded-md text-sm transition flex items-center justify-center space-x-1">
+                            <span class="material-symbols-outlined text-base">outbox</span>
+                            <span>Take Copy</span>
+                        </button>
+                        <button @click="processViewerTransaction('return')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-3 rounded-md text-sm transition flex items-center justify-center space-x-1">
+                            <span class="material-symbols-outlined text-base">inbox</span>
+                            <span>Return Copy</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- OWNER MODE DASHBOARD -->
+        <div x-show="mode === 'owner'" x-cloak class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Add New Book Card -->
+                <div class="google-card p-5 border-t-4 border-t-blue-600 space-y-4">
+                    <h2 class="text-base font-bold text-gray-800 flex items-center space-x-2 google-sans">
+                        <span class="material-symbols-outlined text-blue-600">add_circle</span>
+                        <span>Add New Book Title</span>
+                    </h2>
+                    <form @submit.prevent="addBook()" class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700">Book Title *</label>
+                            <input type="text" x-model="newBook.title" required placeholder="e.g. Design Patterns" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700">Author (Optional)</label>
+                            <input type="text" x-model="newBook.author" placeholder="e.g. Erich Gamma" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700">Initial Total Copies *</label>
+                            <input type="number" min="1" x-model.number="newBook.totalCopies" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <button type="submit" class="w-full google-blue-btn font-medium py-2 px-4 rounded-md text-sm shadow-sm transition flex items-center justify-center space-x-1">
+                            <span class="material-symbols-outlined text-base">add</span>
+                            <span>Save Book Title</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Manage Borrower Names -->
+                <div class="google-card p-5 border-t-4 border-t-purple-600 space-y-4">
+                    <h2 class="text-base font-bold text-gray-800 flex items-center space-x-2 google-sans">
+                        <span class="material-symbols-outlined text-purple-600">group_add</span>
+                        <span>Manage Borrower Names</span>
+                    </h2>
+                    <form @submit.prevent="addBorrowerName()" class="flex space-x-2">
+                        <input type="text" x-model="newBorrowerInput" placeholder="Enter full name..." class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-medium px-4 py-2 rounded-md text-sm transition">
+                            + Add
+                        </button>
+                    </form>
+
+                    <div class="space-y-1 max-h-48 overflow-y-auto pr-1">
+                        <template x-for="(name, index) in borrowerNames" :key="index">
+                            <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md border border-gray-200 text-xs">
+                                <span class="font-medium text-gray-700" x-text="name"></span>
+                                <button @click="removeBorrowerName(index)" class="text-gray-400 hover:text-red-600 transition">
+                                    <span class="material-symbols-outlined text-sm">close</span>
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Security & Access Passcode Settings -->
+                <div class="google-card p-5 border-t-4 border-t-amber-500 space-y-4">
+                    <h2 class="text-base font-bold text-gray-800 flex items-center space-x-2 google-sans">
+                        <span class="material-symbols-outlined text-amber-500">vpn_key</span>
+                        <span>Passcode & Key Management</span>
+                    </h2>
+
+                    <!-- Viewer Passcode Setting -->
+                    <div class="border-b pb-3 space-y-2">
+                        <label class="block text-xs font-semibold text-gray-700">Viewer Mode Access Code</label>
+                        <div class="flex space-x-2">
+                            <input type="text" x-model="tempViewerCode" class="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                            <button @click="updateViewerCode()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs px-3 py-1.5 rounded-md transition">Update Code</button>
+                        </div>
+                    </div>
+
+                    <!-- Owner Passcode Keys -->
+                    <div class="space-y-2">
+                        <label class="block text-xs font-semibold text-gray-700">Owner Passcode Key(s)</label>
+                        <form @submit.prevent="addOwnerKey()" class="flex space-x-2">
+                            <input type="text" x-model="newOwnerKeyInput" placeholder="e.g. 5678" class="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                            <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs px-3 py-1.5 rounded-md transition">Add Key</button>
+                        </form>
+
+                        <div class="space-y-1 max-h-24 overflow-y-auto pt-1">
+                            <label class="block text-[10px] text-gray-400 uppercase font-bold">Active Owner Keys:</label>
+                            <template x-for="(key, index) in ownerKeys" :key="index">
+                                <div class="flex items-center justify-between px-2 py-1 bg-amber-50 rounded border border-amber-200 text-xs">
+                                    <span class="font-mono text-amber-900" x-text="'🔒 ' + key"></span>
+                                    <button @click="removeOwnerKey(index)" x-show="ownerKeys.length > 1" class="text-amber-400 hover:text-red-600 transition">
+                                        <span class="material-symbols-outlined text-xs">close</span>
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction Activity Logs -->
+            <div class="google-card p-5">
+                <h2 class="text-base font-bold text-gray-800 mb-3 flex items-center space-x-2 google-sans">
+                    <span class="material-symbols-outlined text-gray-600">history</span>
+                    <span>Borrower Transaction Logs</span>
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-gray-600">
+                        <thead class="bg-gray-100 text-gray-700 font-semibold uppercase tracking-wider border-b">
+                            <tr>
+                                <th class="py-2.5 px-3">Date & Time</th>
+                                <th class="py-2.5 px-3">Borrower Name</th>
+                                <th class="py-2.5 px-3">Book Title</th>
+                                <th class="py-2.5 px-3">Action</th>
+                                <th class="py-2.5 px-3">Copies</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <template x-for="log in transactionLogs" :key="log.id">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-2 px-3 whitespace-nowrap" x-text="log.timestamp"></td>
+                                    <td class="py-2 px-3 font-semibold text-gray-800" x-text="log.borrowerName"></td>
+                                    <td class="py-2 px-3" x-text="log.bookTitle"></td>
+                                    <td class="py-2 px-3">
+                                        <span :class="log.action === 'take' ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800'" 
+                                              class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase" x-text="log.action"></span>
+                                    </td>
+                                    <td class="py-2 px-3 font-bold" x-text="log.quantity"></td>
+                                </tr>
+                            </template>
+                            <template x-if="transactionLogs.length === 0">
+                                <tr>
+                                    <td colspan="5" class="py-4 text-center text-gray-400">No transaction logs recorded yet.</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SHARED BOOK INVENTORY & BORROWERS TABLE -->
+        <div class="google-card p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 mb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-gray-800 flex items-center space-x-2 google-sans">
+                        <span class="material-symbols-outlined text-blue-600">analytics</span>
+                        <span>Book Inventory & Active Borrowers Table</span>
+                    </h2>
+                </div>
+
+                <!-- Controls: Filter & Search -->
+                <div class="flex items-center space-x-3">
+                    <div class="bg-gray-100 p-1 rounded-lg flex text-xs font-medium">
+                        <button @click="filterStatus = 'all'" :class="filterStatus === 'all' ? 'bg-white shadow text-blue-600' : 'text-gray-600'" class="px-3 py-1 rounded-md transition">All</button>
+                        <button @click="filterStatus = 'available'" :class="filterStatus === 'available' ? 'bg-white shadow text-blue-600' : 'text-gray-600'" class="px-3 py-1 rounded-md transition">Available</button>
+                        <button @click="filterStatus = 'out'" :class="filterStatus === 'out' ? 'bg-white shadow text-blue-600' : 'text-gray-600'" class="px-3 py-1 rounded-md transition">Out of Stock</button>
+                    </div>
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-2.5 top-2 text-gray-400 text-sm">search</span>
+                        <input type="text" x-model="searchQuery" placeholder="Search title or author..." class="pl-8 pr-3 py-1.5 border border-gray-300 rounded-md text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none w-48">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">
+                            <th class="py-3 px-4">Book Title & Author</th>
+                            <th class="py-3 px-4 text-center">Available</th>
+                            <th class="py-3 px-4 text-center">Checked Out</th>
+                            <th class="py-3 px-4">Active Borrowers</th>
+                            <th class="py-3 px-4">Stock Availability</th>
+                            <th x-show="mode === 'owner'" class="py-3 px-4 text-center">Owner Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 text-sm">
+                        <template x-for="book in filteredBooks" :key="book.id">
+                            <tr class="hover:bg-blue-50/40 transition">
+                                <td class="py-3.5 px-4">
+                                    <div class="font-semibold text-gray-900" x-text="book.title"></div>
+                                    <div class="text-xs text-gray-500" x-text="book.author || 'Unknown Author'"></div>
+                                </td>
+                                <td class="py-3.5 px-4 text-center">
+                                    <span :class="book.availableCopies > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'" 
+                                          class="px-2.5 py-1 rounded-full text-xs font-bold" 
+                                          x-text="book.availableCopies"></span>
+                                </td>
+                                <td class="py-3.5 px-4 text-center font-semibold text-amber-700" x-text="book.checkedOutCopies"></td>
+                                <td class="py-3.5 px-4">
+                                    <div class="flex flex-wrap gap-1">
+                                        <template x-for="(count, borrower) in book.borrowers" :key="borrower">
+                                            <span x-show="count > 0" class="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-xs bg-blue-50 border border-blue-200 text-blue-700">
+                                                <span class="material-symbols-outlined text-[10px]">person</span>
+                                                <span x-text="borrower"></span>
+                                                <span class="font-bold bg-blue-600 text-white rounded-full px-1.5 py-0.2 text-[10px]" x-text="count"></span>
+                                            </span>
+                                        </template>
+                                        <template x-if="!hasActiveBorrowers(book)">
+                                            <span class="text-xs text-gray-400 italic">None</span>
+                                        </template>
+                                    </div>
+                                </td>
+                                <td class="py-3.5 px-4">
+                                    <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden max-w-xs">
+                                        <div class="h-2 rounded-full transition-all duration-500" 
+                                             :style="'width: ' + Math.round((book.availableCopies / book.totalCopies) * 100) + '%'"
+                                             :class="book.availableCopies === 0 ? 'bg-red-500' : (book.availableCopies < 2 ? 'bg-amber-500' : 'bg-emerald-500')"></div>
+                                    </div>
+                                    <div class="flex justify-between text-[10px] text-gray-400 mt-1 max-w-xs">
+                                        <span x-text="book.availableCopies === 0 ? 'Out of Stock' : (book.availableCopies < 2 ? 'Low Stock' : 'In Stock')"></span>
+                                        <span x-text="Math.round((book.availableCopies / book.totalCopies) * 100) + '%'"></span>
+                                    </div>
+                                </td>
+                                <td x-show="mode === 'owner'" class="py-3.5 px-4 text-center">
+                                    <div class="flex items-center justify-center space-x-1">
+                                        <button @click="adjustTotalCopies(book, 1)" title="Add Copy" class="p-1 text-gray-600 hover:text-blue-600 transition">
+                                            <span class="material-symbols-outlined text-base">add_circle</span>
+                                        </button>
+                                        <button @click="adjustTotalCopies(book, -1)" title="Remove Copy" class="p-1 text-gray-600 hover:text-amber-600 transition">
+                                            <span class="material-symbols-outlined text-base">remove_circle</span>
+                                        </button>
+                                        <button @click="deleteBook(book)" title="Delete Title" class="p-1 text-gray-400 hover:text-red-600 transition ml-2">
+                                            <span class="material-symbols-outlined text-base">delete</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        <template x-if="filteredBooks.length === 0">
+                            <tr>
+                                <td colspan="6" class="py-8 text-center text-gray-400">No books found matching your criteria.</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Guide Modal -->
+    <div x-show="showGuideModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" x-cloak>
+        <div class="bg-white rounded-lg max-w-lg w-full p-6 space-y-4 shadow-xl">
+            <div class="flex items-center justify-between border-b pb-3">
+                <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2 google-sans">
+                    <span class="material-symbols-outlined text-blue-600">help</span>
+                    <span>System User Guide</span>
+                </h3>
+                <button @click="showGuideModal = false" class="text-gray-400 hover:text-gray-600">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="space-y-3 text-xs text-gray-600 leading-relaxed max-h-96 overflow-y-auto">
+                <p><strong>Viewer Mode:</strong> Allows users to select their name and borrow or return book copies.</p>
+                <p><strong>Owner Mode:</strong> Protects inventory management. Add new books, update stock counts, view transaction logs, and adjust access passcodes.</p>
+                <p><strong>Passcode Keys:</strong> Passcode keys are managed inside Owner Mode settings.</p>
+            </div>
+            <div class="text-right pt-2 border-t">
+                <button @click="showGuideModal = false" class="google-blue-btn font-medium px-4 py-2 rounded-md text-xs">Got it</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Owner Authentication Modal -->
+    <div x-show="showAuthModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" x-cloak>
+        <div class="bg-white rounded-lg max-w-sm w-full p-6 space-y-4 shadow-xl text-center">
+            <div class="h-12 w-12 bg-blue-50 border border-blue-100 rounded-full flex items-center justify-center mx-auto p-1.5">
+                <img src="https://upload.wikimedia.org/wikipedia/en/thumb/e/e6/West_Windsor-Plainsboro_High_School_North_logo.png/220px-West_Windsor-Plainsboro_High_School_North_logo.png" 
+                     alt="Blue Knights Logo" 
+                     class="h-full w-full object-contain"
+                     onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/google/material-design-icons/master/png/action/book/2x/baseline_book_black_24dp.png';" />
+            </div>
+            <h3 class="font-bold text-gray-800 text-base google-sans">Owner Passcode Required</h3>
+            <p class="text-xs text-gray-500">Enter your Owner Key to access full administrative privileges.</p>
+            <input type="password" 
+                   x-model="authPassInput" 
+                   @keyup.enter="authenticateOwner()"
+                   placeholder="Enter Passcode" 
+                   class="w-full text-center text-lg tracking-widest px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <div class="flex space-x-2 pt-2">
+                <button @click="showAuthModal = false" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 rounded-md text-xs transition">Cancel</button>
+                <button @click="authenticateOwner()" class="flex-1 google-blue-btn font-medium py-2 rounded-md text-xs transition">Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function bookInventoryApp() {
+            return {
+                mode: 'viewer',
+                viewerAuthenticated: false,
+                viewerPasscode: 'read26',
+                viewerPassInput: '',
+                ownerKeys: ['LA2627'],
+                tempViewerCode: 'read26',
+                newOwnerKeyInput: '',
+                showAuthModal: false,
+                showGuideModal: false,
+                authPassInput: '',
+                searchQuery: '',
+                filterStatus: 'all',
+                newBorrowerInput: '',
+                borrowerNames: ['Alex Johnson', 'Beatriz Silva', 'Carlos Mendez', 'Diana Prince'],
+                toast: { show: false, message: '', type: 'info' },
+
+                newBook: { title: '', author: '', totalCopies: 1 },
+                viewerForm: { borrowerName: '', customBorrowerName: '', bookId: '', quantity: 1 },
+
+                books: [
+                    { id: 1, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', totalCopies: 5, availableCopies: 3, checkedOutCopies: 2, borrowers: { 'Alex Johnson': 2 } },
+                    { id: 2, title: '1984', author: 'George Orwell', totalCopies: 8, availableCopies: 8, checkedOutCopies: 0, borrowers: {} },
+                    { id: 3, title: 'Clean Code', author: 'Robert C. Martin', totalCopies: 4, availableCopies: 1, checkedOutCopies: 3, borrowers: { 'Beatriz Silva': 2, 'Carlos Mendez': 1 } },
+                    { id: 4, title: 'To Kill a Mockingbird', author: 'Harper Lee', totalCopies: 6, availableCopies: 4, checkedOutCopies: 2, borrowers: { 'Diana Prince': 2 } }
+                ],
+                transactionLogs: [],
+
+                init() {
+                    const savedBooks = localStorage.getItem('wwp_books');
+                    if (savedBooks) this.books = JSON.parse(savedBooks);
+
+                    const savedBorrowers = localStorage.getItem('wwp_borrowers');
+                    if (savedBorrowers) this.borrowerNames = JSON.parse(savedBorrowers);
+
+                    const savedOwnerKeys = localStorage.getItem('wwp_owner_keys');
+                    if (savedOwnerKeys) this.ownerKeys = JSON.parse(savedOwnerKeys);
+
+                    const savedViewerCode = localStorage.getItem('wwp_viewer_code');
+                    if (savedViewerCode) {
+                        this.viewerPasscode = savedViewerCode;
+                        this.tempViewerCode = savedViewerCode;
+                    }
+
+                    const savedLogs = localStorage.getItem('wwp_logs');
+                    if (savedLogs) this.transactionLogs = JSON.parse(savedLogs);
+                },
+
+                saveData() {
+                    localStorage.setItem('wwp_books', JSON.stringify(this.books));
+                    localStorage.setItem('wwp_borrowers', JSON.stringify(this.borrowerNames));
+                    localStorage.setItem('wwp_owner_keys', JSON.stringify(this.ownerKeys));
+                    localStorage.setItem('wwp_viewer_code', this.viewerPasscode);
+                    localStorage.setItem('wwp_logs', JSON.stringify(this.transactionLogs));
+                },
+
+                showNotification(msg, type = 'info') {
+                    this.toast.message = msg;
+                    this.toast.type = type;
+                    this.toast.show = true;
+                    setTimeout(() => { this.toast.show = false; }, 3000);
+                },
+
+                authenticateViewer() {
+                    if (this.viewerPassInput.trim() === this.viewerPasscode) {
+                        this.viewerAuthenticated = true;
+                        this.viewerPassInput = '';
+                        this.showNotification('Viewer Access Granted');
+                    } else {
+                        this.showNotification('Incorrect Viewer Access Code', 'error');
+                    }
+                },
+
+                switchToViewer() {
+                    this.mode = 'viewer';
+                },
+
+                requestOwnerAccess() {
+                    if (this.mode === 'owner') return;
+                    this.authPassInput = '';
+                    this.showAuthModal = true;
+                },
+
+                authenticateOwner() {
+                    if (this.ownerKeys.includes(this.authPassInput.trim())) {
+                        this.mode = 'owner';
+                        this.showAuthModal = false;
+                        this.showNotification('Welcome Owner');
+                    } else {
+                        this.showNotification('Invalid Owner Passcode Key', 'error');
+                    }
+                },
+
+                updateViewerCode() {
+                    if (!this.tempViewerCode.trim()) return;
+                    this.viewerPasscode = this.tempViewerCode.trim();
+                    this.saveData();
+                    this.showNotification('Viewer Access Code updated!');
+                },
+
+                addOwnerKey() {
+                    const newKey = this.newOwnerKeyInput.trim();
+                    if (newKey && !this.ownerKeys.includes(newKey)) {
+                        this.ownerKeys.push(newKey);
+                        this.newOwnerKeyInput = '';
+                        this.saveData();
+                        this.showNotification('New Owner Key added');
+                    }
+                },
+
+                removeOwnerKey(index) {
+                    if (this.ownerKeys.length > 1) {
+                        this.ownerKeys.splice(index, 1);
+                        this.saveData();
+                        this.showNotification('Owner Key removed');
+                    }
+                },
+
+                addBorrowerName() {
+                    const name = this.newBorrowerInput.trim();
+                    if (name && !this.borrowerNames.includes(name)) {
+                        this.borrowerNames.push(name);
+                        this.borrowerNames.sort();
+                        this.newBorrowerInput = '';
+                        this.saveData();
+                        this.showNotification('Borrower added');
+                    }
+                },
+
+                removeBorrowerName(index) {
+                    this.borrowerNames.splice(index, 1);
+                    this.saveData();
+                },
+
+                addBook() {
+                    if (!this.newBook.title.trim()) return;
+                    const newId = this.books.length > 0 ? Math.max(...this.books.map(b => b.id)) + 1 : 1;
+                    this.books.push({
+                        id: newId,
+                        title: this.newBook.title.trim(),
+                        author: this.newBook.author.trim(),
+                        totalCopies: Number(this.newBook.totalCopies),
+                        availableCopies: Number(this.newBook.totalCopies),
+                        checkedOutCopies: 0,
+                        borrowers: {}
+                    });
+                    this.newBook = { title: '', author: '', totalCopies: 1 };
+                    this.saveData();
+                    this.showNotification('Book added to inventory');
+                },
+
+                adjustTotalCopies(book, amount) {
+                    if (amount < 0 && book.totalCopies <= 1) return;
+                    book.totalCopies += amount;
+                    book.availableCopies += amount;
+                    if (book.availableCopies < 0) book.availableCopies = 0;
+                    this.saveData();
+                },
+
+                deleteBook(book) {
+                    if (confirm(`Are you sure you want to delete "${book.title}"?`)) {
+                        this.books = this.books.filter(b => b.id !== book.id);
+                        this.saveData();
+                        this.showNotification('Book deleted');
+                    }
+                },
+
+                processViewerTransaction(type) {
+                    let borrower = this.viewerForm.borrowerName;
+                    if (borrower === '__NEW_USER__') {
+                        borrower = this.viewerForm.customBorrowerName.trim();
+                        if (borrower && !this.borrowerNames.includes(borrower)) {
+                            this.borrowerNames.push(borrower);
+                            this.borrowerNames.sort();
+                        }
+                    }
+
+                    if (!borrower) {
+                        this.showNotification('Please select or enter borrower name', 'error');
+                        return;
+                    }
+
+                    const book = this.books.find(b => b.id == this.viewerForm.bookId);
+                    if (!book) {
+                        this.showNotification('Please select a book', 'error');
+                        return;
+                    }
+
+                    const qty = Number(this.viewerForm.quantity);
+                    if (qty <= 0) return;
+
+                    if (!book.borrowers) book.borrowers = {};
+
+                    if (type === 'take') {
+                        if (book.availableCopies < qty) {
+                            this.showNotification('Not enough copies available', 'error');
+                            return;
+                        }
+                        book.availableCopies -= qty;
+                        book.checkedOutCopies += qty;
+                        book.borrowers[borrower] = (book.borrowers[borrower] || 0) + qty;
+                        this.showNotification(`Checked out ${qty} copy(ies)`);
+                    } else if (type === 'return') {
+                        const currentHeld = book.borrowers[borrower] || 0;
+                        if (currentHeld < qty) {
+                            this.showNotification(`${borrower} only holds ${currentHeld} copy(ies)`, 'error');
+                            return;
+                        }
+                        book.availableCopies += qty;
+                        book.checkedOutCopies -= qty;
+                        book.borrowers[borrower] -= qty;
+                        if (book.borrowers[borrower] <= 0) delete book.borrowers[borrower];
+                        this.showNotification(`Returned ${qty} copy(ies)`);
+                    }
+
+                    this.transactionLogs.unshift({
+                        id: Date.now(),
+                        timestamp: new Date().toLocaleString(),
+                        borrowerName: borrower,
+                        bookTitle: book.title,
+                        action: type,
+                        quantity: qty
+                    });
+
+                    this.viewerForm = { borrowerName: '', customBorrowerName: '', bookId: '', quantity: 1 };
+                    this.saveData();
+                },
+
+                hasActiveBorrowers(book) {
+                    if (!book.borrowers) return false;
+                    return Object.values(book.borrowers).some(count => count > 0);
+                },
+
+                get filteredBooks() {
+                    return this.books.filter(book => {
+                        const matchesSearch = book.title.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
+                                              (book.author && book.author.toLowerCase().includes(this.searchQuery.toLowerCase()));
+                        if (this.filterStatus === 'available') return matchesSearch && book.availableCopies > 0;
+                        if (this.filterStatus === 'out') return matchesSearch && book.availableCopies === 0;
+                        return matchesSearch;
+                    });
+                }
+            }
         }
-    }
-
-    function deleteBook(bookId) {
-        state.books = state.books.filter(b => b.id !== bookId);
-        saveState();
-        renderBooks();
-    }
-
-    function addSampleBook() {
-        // Quick button to add back 1984 if deleted for test purposes
-        if(!state.books.some(b => b.title === '1984')) {
-            state.books.unshift({ id: 'b' + Date.now(), title: '1984', available: 8, checkedOut: 0 });
-            saveState();
-            renderBooks();
-        }
-    }
-
-    function addName() {
-        const input = document.getElementById('nameInput');
-        const name = input.value.trim();
-        if (name) {
-            state.names.push(name);
-            input.value = '';
-            saveState();
-            renderNames();
-        }
-    }
-
-    function removeName(index) {
-        state.names.splice(index, 1);
-        saveState();
-        renderNames();
-    }
-
-    function updateViewerCode() {
-        const val = document.getElementById('viewerCodeInput').value.trim();
-        if(val) {
-            state.viewerCode = val;
-            saveState();
-            alert('Viewer Access Code successfully updated to: ' + val);
-        }
-    }
-
-    document.getElementById('viewerCodeInput').value = state.viewerCode;
-
-    function addOwnerKey() {
-        const input = document.getElementById('ownerKeyInput');
-        const key = input.value.trim().toUpperCase();
-        if(key && !state.ownerKeys.includes(key)) {
-            state.ownerKeys.push(key);
-            input.value = '';
-            saveState();
-            renderKeys();
-        }
-    }
-
-    // Initial View Run
-    renderAll();
-</script>
-
+    </script>
 </body>
 </html>
