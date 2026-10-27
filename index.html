@@ -660,7 +660,7 @@
             <div class="space-y-3 text-xs text-gray-600 leading-relaxed max-h-96 overflow-y-auto">
                 <p><strong>Viewer Portal Flow:</strong> Teachers log in with the passcode, select their name from the staff profile screen, and access their borrowing/hold dashboard.</p>
                 <p><strong>Holds System:</strong> Teachers can place holds with a target "Needed By" date for upcoming classroom units.</p>
-                <p><strong>Owner Privileges & Deletions:</strong> Owner authentication remains persistent during the session. Deleting a transaction log or fulfilling an order automatically syncs and restores inventory counts.</p>
+                <p><strong>Owner Privileges & Inventory Sync:</strong> Fulfilling a teacher request automatically updates book inventory counts and registers the borrower.</p>
             </div>
             <div class="text-right pt-2 border-t">
                 <button @click="showGuideModal = false" class="google-blue-btn font-medium px-4 py-2 rounded-md text-xs">Got it</button>
@@ -939,44 +939,43 @@
                     this.showNotification(`Hold logged for ${teacher}`);
                 },
 
-               strikeAndCompleteRequest(req) {
-    req.struck = true;
-    
-    // Automatically deduct stock and register checkout in inventory table
-    const book = this.books.find(b => b.title === req.bookTitle);
-    if (book) {
-        const qty = Number(req.quantity);
-        if (book.availableCopies >= qty) {
-            book.availableCopies -= qty;
-            book.checkedOutCopies += qty;
-            
-            if (!book.borrowers) book.borrowers = {};
-            book.borrowers[req.teacherName] = (book.borrowers[req.teacherName] || 0) + qty;
+                strikeAndCompleteRequest(req) {
+                    req.struck = true;
 
-            // Log it in official transaction activity logs
-            this.transactionLogs.unshift({
-                id: Date.now(),
-                timestamp: new Date().toLocaleString(),
-                borrowerName: req.teacherName,
-                bookTitle: book.title,
-                action: 'take',
-                quantity: qty
-            });
-            
-            this.showNotification(`Fulfilled ${qty} copy(ies) for ${req.teacherName}. Stock updated!`);
-        } else {
-            this.showNotification(`Warning: Not enough available copies for ${book.title}`, 'error');
-        }
-    }
+                    // Locate book by title (case-insensitive & trimmed)
+                    const book = this.books.find(b => b.title.trim().toLowerCase() === req.bookTitle.trim().toLowerCase());
+                    if (book) {
+                        const qty = Number(req.quantity);
+                        if (book.availableCopies >= qty) {
+                            book.availableCopies -= qty;
+                            book.checkedOutCopies += qty;
+                            
+                            if (!book.borrowers) book.borrowers = {};
+                            book.borrowers[req.teacherName] = (book.borrowers[req.teacherName] || 0) + qty;
 
-    this.saveData();
+                            // Append to central transaction log
+                            this.transactionLogs.unshift({
+                                id: Date.now(),
+                                timestamp: new Date().toLocaleString(),
+                                borrowerName: req.teacherName,
+                                bookTitle: book.title,
+                                action: 'take',
+                                quantity: qty
+                            });
+                            
+                            this.showNotification(`Fulfilled ${qty} copy(ies) for ${req.teacherName}. Stock updated!`);
+                        } else {
+                            this.showNotification(`Warning: Not enough available stock for "${book.title}"`, 'error');
+                        }
+                    }
 
-    // Auto-delete the request entry after visual strikeout delay
-    setTimeout(() => {
-        this.teacherRequests = this.teacherRequests.filter(r => r.id !== req.id);
-        this.saveData();
-    }, 1500);
-}
+                    this.saveData();
+
+                    setTimeout(() => {
+                        this.teacherRequests = this.teacherRequests.filter(r => r.id !== req.id);
+                        this.saveData();
+                    }, 1500);
+                },
 
                 addBook() {
                     if (!this.newBook.title.trim()) return;
@@ -1033,9 +1032,8 @@
                         this.showNotification('Book deleted');
                     } else if (this.deleteType === 'log' && this.itemToDelete) {
                         const log = this.itemToDelete;
-                        const book = this.books.find(b => b.title === log.bookTitle);
+                        const book = this.books.find(b => b.title.trim().toLowerCase() === log.bookTitle.trim().toLowerCase());
                         
-                        // Revert inventory changes dynamically
                         if (book) {
                             if (!book.borrowers) book.borrowers = {};
                             const currentQty = book.borrowers[log.borrowerName] || 0;
