@@ -939,16 +939,44 @@
                     this.showNotification(`Hold logged for ${teacher}`);
                 },
 
-                strikeAndCompleteRequest(req) {
-                    req.struck = true;
-                    this.saveData();
-                    this.showNotification(`Fulfilled request for ${req.teacherName}. Removing...`);
+               strikeAndCompleteRequest(req) {
+    req.struck = true;
+    
+    // Automatically deduct stock and register checkout in inventory table
+    const book = this.books.find(b => b.title === req.bookTitle);
+    if (book) {
+        const qty = Number(req.quantity);
+        if (book.availableCopies >= qty) {
+            book.availableCopies -= qty;
+            book.checkedOutCopies += qty;
+            
+            if (!book.borrowers) book.borrowers = {};
+            book.borrowers[req.teacherName] = (book.borrowers[req.teacherName] || 0) + qty;
 
-                    setTimeout(() => {
-                        this.teacherRequests = this.teacherRequests.filter(r => r.id !== req.id);
-                        this.saveData();
-                    }, 1500);
-                },
+            // Log it in official transaction activity logs
+            this.transactionLogs.unshift({
+                id: Date.now(),
+                timestamp: new Date().toLocaleString(),
+                borrowerName: req.teacherName,
+                bookTitle: book.title,
+                action: 'take',
+                quantity: qty
+            });
+            
+            this.showNotification(`Fulfilled ${qty} copy(ies) for ${req.teacherName}. Stock updated!`);
+        } else {
+            this.showNotification(`Warning: Not enough available copies for ${book.title}`, 'error');
+        }
+    }
+
+    this.saveData();
+
+    // Auto-delete the request entry after visual strikeout delay
+    setTimeout(() => {
+        this.teacherRequests = this.teacherRequests.filter(r => r.id !== req.id);
+        this.saveData();
+    }, 1500);
+}
 
                 addBook() {
                     if (!this.newBook.title.trim()) return;
