@@ -38,7 +38,7 @@
 </head>
 <body class="text-gray-800 antialiased min-h-screen flex flex-col pb-16" x-data="bookInventoryApp()">
 
-    <!-- Header / Navbar (Mobile Stacked, Desktop Inline) -->
+    <!-- Header / Navbar -->
     <header class="bg-white border-b border-gray-200 sticky top-0 z-30 py-2">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
             
@@ -61,15 +61,14 @@
                     </div>
                 </div>
 
-                <!-- Guide Icon (Floated Right on Mobile) -->
+                <!-- Guide Icon (Mobile) -->
                 <button @click="showGuideModal = true" class="sm:hidden p-1 text-gray-500 hover:text-gray-700">
                     <span class="material-symbols-outlined text-xl">help_outline</span>
                 </button>
             </div>
 
-            <!-- Bottom Row on Mobile / Right Side on Desktop: Mode Switcher & Desktop Guide -->
+            <!-- Controls Header Right -->
             <div class="flex items-center justify-between sm:justify-end space-x-2 w-full sm:w-auto pt-1 sm:pt-0 border-t sm:border-0 border-gray-100">
-                <!-- Access Mode Switcher Pill (Full Width on Mobile) -->
                 <div class="bg-gray-100 p-0.5 rounded-full border border-gray-200 flex items-center text-xs font-medium w-full sm:w-auto justify-center">
                     <button @click="switchToViewer()" 
                             :class="mode === 'viewer' ? 'bg-white text-blue-600 shadow-sm font-semibold' : 'text-gray-600 hover:text-gray-900'"
@@ -85,7 +84,6 @@
                     </button>
                 </div>
 
-                <!-- Guide Button (Desktop Only) -->
                 <button @click="showGuideModal = true" class="hidden sm:flex items-center space-x-1 px-2.5 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 transition">
                     <span class="material-symbols-outlined text-base">help_outline</span>
                     <span>Guide</span>
@@ -157,67 +155,165 @@
             </div>
 
             <!-- Viewer Active Dashboard -->
-            <div x-show="viewerAuthenticated" class="google-card p-5 border-t-4 border-t-blue-600">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4 mb-5">
-                    <div>
-                        <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2 google-sans">
-                            <span class="material-symbols-outlined text-blue-600">menu_book</span>
-                            <span>Borrow or Return a Book</span>
-                        </h1>
-                        <p class="text-xs text-gray-500 mt-0.5">Select your name, choose a book title, and select copies to checkout or return.</p>
-                    </div>
-                </div>
-
-                <div :class="viewportMode === 'mobile' ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'" class="grid gap-4 items-end">
-                    <!-- Step 1: Select Borrower Name -->
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">1. Borrower Name *</label>
-                        <select x-model="viewerForm.borrowerName" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            <option value="">-- Select Your Name --</option>
-                            <template x-for="name in borrowerNames" :key="name">
-                                <option :value="name" x-text="name"></option>
-                            </template>
-                            <option value="__NEW_USER__">+ Enter New Borrower Name...</option>
-                        </select>
-                        <div x-show="viewerForm.borrowerName === '__NEW_USER__'" class="mt-2">
-                            <input type="text" x-model="viewerForm.customBorrowerName" placeholder="Type your full name" class="w-full px-3 py-1.5 border border-blue-400 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <div x-show="viewerAuthenticated" class="space-y-6">
+                <!-- Borrow / Return Section -->
+                <div class="google-card p-5 border-t-4 border-t-blue-600">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4 mb-5">
+                        <div>
+                            <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2 google-sans">
+                                <span class="material-symbols-outlined text-blue-600">menu_book</span>
+                                <span>Borrow or Return a Book</span>
+                            </h1>
+                            <p class="text-xs text-gray-500 mt-0.5">Select your name, choose a book title, and select copies to checkout or return.</p>
                         </div>
                     </div>
 
-                    <!-- Step 2: Select Book -->
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">2. Select Book Title *</label>
-                        <select x-model="viewerForm.bookId" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            <option value="">-- Select a Title --</option>
-                            <template x-for="book in books" :key="book.id">
-                                <option :value="book.id" x-text="book.title + ' (' + book.availableCopies + ' available)'"></option>
-                            </template>
-                        </select>
+                    <div :class="viewportMode === 'mobile' ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'" class="grid gap-4 items-end">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">1. Borrower Name *</label>
+                            <select x-model="viewerForm.borrowerName" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="">-- Select Your Name --</option>
+                                <template x-for="name in borrowerNames" :key="name">
+                                    <option :value="name" x-text="name"></option>
+                                </template>
+                                <option value="__NEW_USER__">+ Enter New Borrower Name...</option>
+                            </select>
+                            <div x-show="viewerForm.borrowerName === '__NEW_USER__'" class="mt-2">
+                                <input type="text" x-model="viewerForm.customBorrowerName" placeholder="Type your full name" class="w-full px-3 py-1.5 border border-blue-400 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">2. Select Book Title *</label>
+                            <select x-model="viewerForm.bookId" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="">-- Select a Title --</option>
+                                <template x-for="book in books" :key="book.id">
+                                    <option :value="book.id" x-text="book.title + ' (' + book.availableCopies + ' available)'"></option>
+                                </template>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">3. Number of Copies *</label>
+                            <input type="number" min="1" x-model.number="viewerForm.quantity" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+
+                        <div class="flex space-x-2">
+                            <button @click="processViewerTransaction('take')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-3 rounded-md text-sm transition flex items-center justify-center space-x-1">
+                                <span class="material-symbols-outlined text-base">outbox</span>
+                                <span>Take Copy</span>
+                            </button>
+                            <button @click="processViewerTransaction('return')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-3 rounded-md text-sm transition flex items-center justify-center space-x-1">
+                                <span class="material-symbols-outlined text-base">inbox</span>
+                                <span>Return Copy</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teacher Book Request Form Card -->
+                <div class="google-card p-5 border-t-4 border-t-purple-600">
+                    <div class="border-b pb-3 mb-4">
+                        <h2 class="text-base font-bold text-gray-800 flex items-center space-x-2 google-sans">
+                            <span class="material-symbols-outlined text-purple-600">assignment_add</span>
+                            <span>Teacher Book Request Panel</span>
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-0.5">Teachers can submit bulk book copy requests directly to the library owner.</p>
                     </div>
 
-                    <!-- Step 3: Quantity -->
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">3. Number of Copies *</label>
-                        <input type="number" min="1" x-model.number="viewerForm.quantity" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                    </div>
+                    <form @submit.prevent="submitTeacherRequest()" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Teacher Name *</label>
+                            <select x-model="teacherRequestForm.teacherName" required class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                                <option value="">-- Select Teacher Name --</option>
+                                <template x-for="name in teacherNames" :key="name">
+                                    <option :value="name" x-text="name"></option>
+                                </template>
+                                <option value="__NEW_TEACHER__">+ Enter New Teacher...</option>
+                            </select>
+                            <div x-show="teacherRequestForm.teacherName === '__NEW_TEACHER__'" class="mt-2">
+                                <input type="text" x-model="teacherRequestForm.customTeacherName" placeholder="Enter teacher full name" class="w-full px-3 py-1.5 border border-purple-400 rounded-md text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                            </div>
+                        </div>
 
-                    <!-- Step 4: Submit Buttons -->
-                    <div class="flex space-x-2">
-                        <button @click="processViewerTransaction('take')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-3 rounded-md text-sm transition flex items-center justify-center space-x-1">
-                            <span class="material-symbols-outlined text-base">outbox</span>
-                            <span>Take Copy</span>
-                        </button>
-                        <button @click="processViewerTransaction('return')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-3 rounded-md text-sm transition flex items-center justify-center space-x-1">
-                            <span class="material-symbols-outlined text-base">inbox</span>
-                            <span>Return Copy</span>
-                        </button>
-                    </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Requested Book Title *</label>
+                            <select x-model="teacherRequestForm.bookId" required class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                                <option value="">-- Select Book Title --</option>
+                                <template x-for="book in books" :key="book.id">
+                                    <option :value="book.id" x-text="book.title"></option>
+                                </template>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Number of Copies *</label>
+                            <input type="number" min="1" x-model.number="teacherRequestForm.quantity" required class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        </div>
+
+                        <div>
+                            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-md text-sm transition flex items-center justify-center space-x-1 shadow-sm">
+                                <span class="material-symbols-outlined text-base">send</span>
+                                <span>Submit Request</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
 
         <!-- OWNER MODE DASHBOARD -->
         <div x-show="mode === 'owner'" x-cloak class="space-y-6">
+            
+            <!-- Pending Teacher Book Requests Panel -->
+            <div class="google-card p-5 border-t-4 border-t-purple-600 space-y-3">
+                <div class="flex items-center justify-between border-b pb-3">
+                    <div class="flex items-center space-x-2">
+                        <span class="material-symbols-outlined text-purple-600">pending_actions</span>
+                        <h2 class="text-base font-bold text-gray-800 google-sans">Pending Teacher Book Requests</h2>
+                        <span class="bg-purple-100 text-purple-800 text-xs px-2 py-0.5 rounded-full font-bold" x-text="teacherRequests.length"></span>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-gray-600">
+                        <thead class="bg-purple-50 text-purple-900 font-semibold uppercase tracking-wider border-b">
+                            <tr>
+                                <th class="py-2.5 px-3">Requested On</th>
+                                <th class="py-2.5 px-3">Teacher Name</th>
+                                <th class="py-2.5 px-3">Book Title</th>
+                                <th class="py-2.5 px-3 text-center">Copies Requested</th>
+                                <th class="py-2.5 px-3 text-center">Status / Process Order</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <template x-for="req in teacherRequests" :key="req.id">
+                                <tr :class="req.struck ? 'bg-gray-100 line-through text-gray-400 transition-all duration-500' : 'hover:bg-gray-50'">
+                                    <td class="py-2.5 px-3 whitespace-nowrap" x-text="req.timestamp"></td>
+                                    <td class="py-2.5 px-3 font-semibold text-gray-800" :class="req.struck ? 'line-through text-gray-400' : ''" x-text="req.teacherName"></td>
+                                    <td class="py-2.5 px-3" :class="req.struck ? 'line-through text-gray-400' : ''" x-text="req.bookTitle"></td>
+                                    <td class="py-2.5 px-3 text-center font-bold" x-text="req.quantity"></td>
+                                    <td class="py-2.5 px-3 text-center">
+                                        <button @click="strikeAndCompleteRequest(req)" 
+                                                :disabled="req.struck"
+                                                :class="req.struck ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-700 text-white'" 
+                                                class="px-3 py-1 rounded-md text-xs font-medium transition flex items-center justify-center space-x-1 mx-auto">
+                                            <span class="material-symbols-outlined text-sm" x-text="req.struck ? 'check_circle' : 'strikethrough_s'"></span>
+                                            <span x-text="req.struck ? 'Fulfilled (Deleting...)' : 'Fulfill & Strikeout'"></span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template x-if="teacherRequests.length === 0">
+                                <tr>
+                                    <td colspan="5" class="py-4 text-center text-gray-400">No active teacher book requests pending.</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <div :class="viewportMode === 'mobile' ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-3'" class="grid gap-6">
                 <!-- Add New Book Card -->
                 <div class="google-card p-5 border-t-4 border-t-blue-600 space-y-4">
@@ -245,25 +341,36 @@
                     </form>
                 </div>
 
-                <!-- Manage Borrower Names -->
+                <!-- Manage Borrower Names & Teacher Roster -->
                 <div class="google-card p-5 border-t-4 border-t-purple-600 space-y-4">
                     <h2 class="text-base font-bold text-gray-800 flex items-center space-x-2 google-sans">
                         <span class="material-symbols-outlined text-purple-600">group_add</span>
-                        <span>Manage Borrower Names</span>
+                        <span>Manage Borrower & Teacher Rosters</span>
                     </h2>
+                    
+                    <!-- Borrower Roster Add -->
                     <form @submit.prevent="addBorrowerName()" class="flex space-x-2">
-                        <input type="text" x-model="newBorrowerInput" placeholder="Enter full name..." class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
-                        <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-medium px-4 py-2 rounded-md text-sm transition">
-                            + Add
+                        <input type="text" x-model="newBorrowerInput" placeholder="Add student/borrower name..." class="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-medium px-3 py-1.5 rounded-md text-xs transition">
+                            + Add Student
                         </button>
                     </form>
 
-                    <div class="space-y-1 max-h-48 overflow-y-auto pr-1">
-                        <template x-for="(name, index) in borrowerNames" :key="index">
-                            <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md border border-gray-200 text-xs">
-                                <span class="font-medium text-gray-700" x-text="name"></span>
-                                <button @click="removeBorrowerName(index)" class="text-gray-400 hover:text-red-600 transition">
-                                    <span class="material-symbols-outlined text-sm">close</span>
+                    <!-- Teacher Roster Add -->
+                    <form @submit.prevent="addTeacherName()" class="flex space-x-2">
+                        <input type="text" x-model="newTeacherInput" placeholder="Add teacher name..." class="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <button type="submit" class="bg-purple-800 hover:bg-purple-900 text-white font-medium px-3 py-1.5 rounded-md text-xs transition">
+                            + Add Teacher
+                        </button>
+                    </form>
+
+                    <div class="space-y-1 max-h-40 overflow-y-auto pr-1">
+                        <label class="block text-[10px] text-gray-400 uppercase font-bold">Teachers List:</label>
+                        <template x-for="(teacher, index) in teacherNames" :key="index">
+                            <div class="flex items-center justify-between p-1.5 bg-purple-50 rounded border border-purple-200 text-xs">
+                                <span class="font-medium text-purple-900" x-text="teacher"></span>
+                                <button @click="removeTeacherName(index)" class="text-purple-400 hover:text-red-600 transition">
+                                    <span class="material-symbols-outlined text-xs">close</span>
                                 </button>
                             </div>
                         </template>
@@ -277,7 +384,6 @@
                         <span>Passcode Key Management</span>
                     </h2>
 
-                    <!-- Viewer Passcode Setting -->
                     <div class="border-b pb-3 space-y-2">
                         <label class="block text-xs font-semibold text-gray-700">Viewer Mode Access Code</label>
                         <div class="flex space-x-2">
@@ -286,7 +392,6 @@
                         </div>
                     </div>
 
-                    <!-- Owner Passcode Keys -->
                     <div class="space-y-2">
                         <label class="block text-xs font-semibold text-gray-700">Owner Passcode Key(s)</label>
                         <form @submit.prevent="addOwnerKey()" class="flex space-x-2">
@@ -331,7 +436,6 @@
                 </div>
             </div>
 
-            <!-- Collapsible Table Section -->
             <div x-show="logsExpanded" x-transition class="overflow-x-auto pt-1">
                 <table class="w-full text-left text-xs text-gray-600">
                     <thead class="bg-gray-100 text-gray-700 font-semibold uppercase tracking-wider border-b">
@@ -382,7 +486,6 @@
                     </h2>
                 </div>
 
-                <!-- Controls: Filter & Search -->
                 <div class="flex flex-wrap items-center gap-3">
                     <div class="bg-gray-100 p-1 rounded-lg flex text-xs font-medium">
                         <button @click="filterStatus = 'all'" :class="filterStatus === 'all' ? 'bg-white shadow text-blue-600' : 'text-gray-600'" class="px-3 py-1 rounded-md transition">All</button>
@@ -396,7 +499,6 @@
                 </div>
             </div>
 
-            <!-- Table -->
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
@@ -486,9 +588,9 @@
                 </button>
             </div>
             <div class="space-y-3 text-xs text-gray-600 leading-relaxed max-h-96 overflow-y-auto">
-                <p><strong>Viewer Mode:</strong> Allows users to select their name and borrow or return book copies.</p>
-                <p><strong>Owner Mode:</strong> Protects inventory management. Add new books, update stock counts, view/clear logs, and manage passcodes.</p>
-                <p><strong>Display Layout Banner:</strong> Easily tap "Mobile" or "Desktop" at the top of the screen to format the page for phones or computers.</p>
+                <p><strong>Viewer Mode:</strong> Select your name to borrow or return books, or submit teacher copy requests.</p>
+                <p><strong>Owner Mode:</strong> Manage books, manage teacher requests (fulfill & strikeout), clear logs, and adjust access passcodes.</p>
+                <p><strong>Teacher Request Fulfillment:</strong> Clicking "Fulfill & Strikeout" strikes through the request item and automatically removes it after processing.</p>
             </div>
             <div class="text-right pt-2 border-t">
                 <button @click="showGuideModal = false" class="google-blue-btn font-medium px-4 py-2 rounded-md text-xs">Got it</button>
@@ -545,6 +647,7 @@
                 ownerKeys: ['LA2627'],
                 tempViewerCode: 'read26',
                 newOwnerKeyInput: '',
+                newTeacherInput: '',
                 showAuthModal: false,
                 showGuideModal: false,
                 showDeleteModal: false,
@@ -558,10 +661,12 @@
                 filterStatus: 'all',
                 newBorrowerInput: '',
                 borrowerNames: ['Alex Johnson', 'Beatriz Silva', 'Carlos Mendez', 'Diana Prince'],
+                teacherNames: ['Mr. Smith', 'Ms. Davis', 'Dr. Adams', 'Mrs. Taylor'],
                 toast: { show: false, message: '', type: 'info' },
 
                 newBook: { title: '', author: '', totalCopies: 1 },
                 viewerForm: { borrowerName: '', customBorrowerName: '', bookId: '', quantity: 1 },
+                teacherRequestForm: { teacherName: '', customTeacherName: '', bookId: '', quantity: 1 },
 
                 books: [
                     { id: 1, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', totalCopies: 5, availableCopies: 5, checkedOutCopies: 0, borrowers: {} },
@@ -570,6 +675,7 @@
                     { id: 4, title: 'To Kill a Mockingbird', author: 'Harper Lee', totalCopies: 6, availableCopies: 4, checkedOutCopies: 2, borrowers: { 'Diana Prince': 2 } }
                 ],
                 transactionLogs: [],
+                teacherRequests: [],
 
                 init() {
                     const savedBooks = localStorage.getItem('wwp_books');
@@ -577,6 +683,9 @@
 
                     const savedBorrowers = localStorage.getItem('wwp_borrowers');
                     if (savedBorrowers) this.borrowerNames = JSON.parse(savedBorrowers);
+
+                    const savedTeachers = localStorage.getItem('wwp_teachers');
+                    if (savedTeachers) this.teacherNames = JSON.parse(savedTeachers);
 
                     const savedOwnerKeys = localStorage.getItem('wwp_owner_keys');
                     if (savedOwnerKeys) this.ownerKeys = JSON.parse(savedOwnerKeys);
@@ -589,14 +698,19 @@
 
                     const savedLogs = localStorage.getItem('wwp_logs');
                     if (savedLogs) this.transactionLogs = JSON.parse(savedLogs);
+
+                    const savedTeacherReqs = localStorage.getItem('wwp_teacher_requests');
+                    if (savedTeacherReqs) this.teacherRequests = JSON.parse(savedTeacherReqs);
                 },
 
                 saveData() {
                     localStorage.setItem('wwp_books', JSON.stringify(this.books));
                     localStorage.setItem('wwp_borrowers', JSON.stringify(this.borrowerNames));
+                    localStorage.setItem('wwp_teachers', JSON.stringify(this.teacherNames));
                     localStorage.setItem('wwp_owner_keys', JSON.stringify(this.ownerKeys));
                     localStorage.setItem('wwp_viewer_code', this.viewerPasscode);
                     localStorage.setItem('wwp_logs', JSON.stringify(this.transactionLogs));
+                    localStorage.setItem('wwp_teacher_requests', JSON.stringify(this.teacherRequests));
                 },
 
                 showNotification(msg, type = 'info') {
@@ -672,9 +786,69 @@
                     }
                 },
 
-                removeBorrowerName(index) {
-                    this.borrowerNames.splice(index, 1);
+                addTeacherName() {
+                    const name = this.newTeacherInput.trim();
+                    if (name && !this.teacherNames.includes(name)) {
+                        this.teacherNames.push(name);
+                        this.teacherNames.sort();
+                        this.newTeacherInput = '';
+                        this.saveData();
+                        this.showNotification('Teacher added');
+                    }
+                },
+
+                removeTeacherName(index) {
+                    this.teacherNames.splice(index, 1);
                     this.saveData();
+                },
+
+                submitTeacherRequest() {
+                    let teacher = this.teacherRequestForm.teacherName;
+                    if (teacher === '__NEW_TEACHER__') {
+                        teacher = this.teacherRequestForm.customTeacherName.trim();
+                        if (teacher && !this.teacherNames.includes(teacher)) {
+                            this.teacherNames.push(teacher);
+                            this.teacherNames.sort();
+                        }
+                    }
+
+                    if (!teacher) {
+                        this.showNotification('Please select or enter a teacher name', 'error');
+                        return;
+                    }
+
+                    const book = this.books.find(b => b.id == this.teacherRequestForm.bookId);
+                    if (!book) {
+                        this.showNotification('Please select a book', 'error');
+                        return;
+                    }
+
+                    const qty = Number(this.teacherRequestForm.quantity);
+                    if (qty <= 0) return;
+
+                    this.teacherRequests.unshift({
+                        id: Date.now(),
+                        timestamp: new Date().toLocaleString(),
+                        teacherName: teacher,
+                        bookTitle: book.title,
+                        quantity: qty,
+                        struck: false
+                    });
+
+                    this.teacherRequestForm = { teacherName: '', customTeacherName: '', bookId: '', quantity: 1 };
+                    this.saveData();
+                    this.showNotification('Book request submitted to owner!');
+                },
+
+                strikeAndCompleteRequest(req) {
+                    req.struck = true;
+                    this.saveData();
+                    this.showNotification(`Fulfilled request for ${req.teacherName}. Removing...`);
+
+                    setTimeout(() => {
+                        this.teacherRequests = this.teacherRequests.filter(r => r.id !== req.id);
+                        this.saveData();
+                    }, 1500);
                 },
 
                 addBook() {
